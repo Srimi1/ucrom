@@ -186,7 +186,7 @@ def test_mainline_fallback_device_tree(evidence):
     dts = subprocess.run(["dtc", "-I", "dtb", "-O", "dts", str(DTB)], capture_output=True, text=True,
                          check=True).stdout
     assert 'model = "OnePlus 7T Pro";' in dts
-    assert '"oneplus,hotdog"' in dts
+    assert re.search(r'compatible = "oneplus,hotdog(\\0|")', dts)
     ts = re.search(r"touchscreen@48 \{(.*?)\n\t\t\};", dts, re.S)
     assert ts and 'compatible = "samsung,s6sy761"' in ts[1]
     assert re.search(r"framebuffer@9c000000 \{[^}]*width = <0x5a0>;[^}]*height = <0xc30>;", dts, re.S | re.I)

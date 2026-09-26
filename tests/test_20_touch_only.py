@@ -9,6 +9,8 @@ import time
 
 import pytest
 
+import ui
+
 pytestmark = pytest.mark.vm
 
 INPUTS = r"""
@@ -41,17 +43,21 @@ def test_compositor_sees_only_touch(phone, evidence):
     r = phone.sh("libinput list-devices 2>/dev/null | sed -n 's/^Device: *//p'")
     names = [n.strip() for n in r.out.splitlines() if n.strip()]
     evidence.note("libinput devices: " + ", ".join(names))
-    assert any("ultitouch" in n for n in names)
+    assert any("multitouch" in n.lower() for n in names)
     assert not any("Keyboard" in n or "Mouse" in n for n in names)
+
+
+CURSOR_HOME = (190, 195, 240, 255)
 
 
 def _read_events(phone, name_part, seconds):
     """Start a raw evdev reader in the guest on the named device."""
     script = f"""
-python3 - <<'PY' &
+python3 - >/dev/null 2>&1 <<'PY' &
 import evdev, select, time
 devs = [evdev.InputDevice(p) for p in evdev.list_devices()]
 dev = next(d for d in devs if '{name_part}' in d.name)
+open('/tmp/ucrom-evready-{name_part.replace(" ", "_")}', 'w').write('1')
 n = 0
 end = time.time() + {seconds}
 while time.time() < end:
@@ -61,18 +67,33 @@ while time.time() < end:
 open('/tmp/ucrom-evcount-{name_part.replace(" ", "_")}', 'w').write(str(n))
 PY
 """
+    tag = name_part.replace(" ", "_")
+    phone.sh(f"rm -f /tmp/ucrom-evready-{tag} /tmp/ucrom-evcount-{tag}")
     phone.sh(script)
+    # python3 + evdev start slowly under emulation: only inject once the
+    # reader really holds the device open, or a zero count would prove nothing
+    phone.wait_until(f"test -f /tmp/ucrom-evready-{tag}", timeout=60, interval=1)
 
 
 def test_hardware_keyboard_typing_does_nothing(phone, evidence):
     """Typing on the keyboard delivers zero events and changes nothing on screen"""
-    _read_events(phone, "Keyboard", 8)
+    # compare the lit lock screen, not a blanked panel: no idle blanking
+    # during the test (test-only setting) and the panel really on
+    phone.sh("gsettings set org.gnome.desktop.session idle-delay 0", user=True)
+    assert ui.ensure_lit(phone), "could not wake the screen by touch"
+    # the lock screen shows a big clock: start just after a minute turns over
+    # so the only thing that could change the screen is the keyboard
+    while int(phone.sh("date +%S").out.strip() or 0) > 15:
+        time.sleep(2)
+    _read_events(phone, "Keyboard", 20)
     time.sleep(1)
+    assert ui.ensure_lit(phone)
     before = evidence.screenshot(phone, "before-typing")
     phone.type_on_hardware_keyboard("hello ucrom\n")
     phone.type_on_hardware_keyboard("rm -rf /\n")
     time.sleep(8)
     after = evidence.screenshot(phone, "after-typing")
+    phone.wait_until("test -f /tmp/ucrom-evcount-Keyboard", timeout=60, interval=1)
     n = phone.sh("cat /tmp/ucrom-evcount-Keyboard").out.strip()
     evidence.note(f"events that reached the keyboard device node: {n}")
     assert n == "0"
@@ -80,18 +101,24 @@ def test_hardware_keyboard_typing_does_nothing(phone, evidence):
     a, b = Image.open(before).convert("RGB"), Image.open(after).convert("RGB")
     # ignore the status bar (clock may tick)
     box = (0, 40, a.width, a.height)
-    diff = ImageChops.difference(a.crop(box), b.crop(box)).getbbox()
+    d = ImageChops.difference(a, b).convert("L")
+    # the (unused) pointer sprite rests at its start position and is drawn
+    # as a separate cursor plane that screendumps show intermittently; blank
+    # its spot. A pointer that moved would show up anywhere else.
+    d.paste(0, CURSOR_HOME)
+    diff = d.crop(box).getbbox()
     evidence.note(f"screen change below status bar: {diff}")
     assert diff is None
 
 
 def test_mouse_does_nothing(phone, evidence):
     """Moving and clicking the mouse delivers zero events"""
-    _read_events(phone, "Mouse", 6)
+    _read_events(phone, "Mouse", 20)
     time.sleep(1)
     for _ in range(10):
         phone.move_mouse(40, 60, click=True)
     time.sleep(6)
+    phone.wait_until("test -f /tmp/ucrom-evcount-Mouse", timeout=60, interval=1)
     n = phone.sh("cat /tmp/ucrom-evcount-Mouse").out.strip()
     evidence.note(f"events that reached the mouse device node: {n}")
     assert n == "0"
@@ -131,10 +158,11 @@ def test_no_keyboard_escape_hatches(phone, evidence):
 
 def test_touch_is_delivered(phone, evidence):
     """Touches on the screen do reach the system"""
-    _read_events(phone, "ultitouch", 5)
+    _read_events(phone, "MultiTouch", 15)
     time.sleep(1)
-    phone.tap(270, 585)
+    phone.tap(phone.w / 2, phone.h / 2)
     time.sleep(5)
-    n = int(phone.sh("cat /tmp/ucrom-evcount-ultitouch").out.strip() or 0)
+    phone.wait_until("test -f /tmp/ucrom-evcount-MultiTouch", timeout=60, interval=1)
+    n = int(phone.sh("cat /tmp/ucrom-evcount-MultiTouch").out.strip() or 0)
     evidence.note(f"touch events delivered for one tap: {n}")
     assert n > 0

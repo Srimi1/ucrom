@@ -79,18 +79,32 @@ if [ "$FLAVOR" = halium ]; then
         install -D -m 755 "$src/hooks/halium" "$MERGED/usr/share/initramfs-tools/hooks/halium"
         install -D -m 644 "$src/conf/halium" "$MERGED/usr/share/initramfs-tools/conf.d/halium"
     fi
+    # The hook copies the unversioned libcrypto.so dev symlink (only present
+    # with libssl-dev); use the runtime library instead.
+    sed -i -E 's#(libcrypto\.so)$#\1.3#' "$MERGED/usr/share/initramfs-tools/hooks/halium"
     # The Halium hook copies a touchscreen udev rule: ship ucrom's touch-only
     # policy in its place, so keyboards are blocked from the very first second.
     cp "$MERGED/etc/udev/rules.d/90-ucrom-touch-only.rules" "$MERGED/etc/udev/rules.d/90-touchscreen.rules"
-    printf 'BOOT=halium\nMODULES=dep\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
+    printf 'BOOT=halium\nMODULES=list\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
 else
-    printf 'MODULES=dep\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
+    printf 'MODULES=most\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
 fi
+# initramfs hooks (Halium's) ask dpkg-architecture for the multiarch triplet;
+# a build-time shim avoids pulling the whole dpkg-dev toolchain into the phone
+SHIM=""
+if ! chroot_run "$MERGED" sh -c 'command -v dpkg-architecture' >/dev/null 2>&1; then
+    SHIM="$MERGED/usr/bin/dpkg-architecture"
+    printf '#!/bin/sh\n# ucrom build-time shim\ncase "$*" in *MULTIARCH*) echo aarch64-linux-gnu ;; *ARCH*) echo arm64 ;; esac\n' > "$SHIM"
+    chmod 755 "$SHIM"
+fi
+mkdir -p "$MERGED/boot"
+cp "$KDIR/config" "$MERGED/boot/config-$KREL"
 chroot_run "$MERGED" sh -c "mkinitramfs -o /tmp/ucrom-initrd.img $KREL" > "$STAGE/initramfs.log" 2>&1 ||
     die "initramfs failed: $(tail -5 "$STAGE/initramfs.log")"
 mkdir -p "$DEST"
 cp "$MERGED/tmp/ucrom-initrd.img" "$DEST/initrd.img"
 rm -f "$MERGED/tmp/ucrom-initrd.img" "$MERGED/etc/udev/rules.d/90-touchscreen.rules"
+[ -z "$SHIM" ] || rm -f "$SHIM"
 chroot_umount "$MERGED"
 
 # --- boot.img
@@ -105,7 +119,7 @@ for k in Image.gz Image; do [ -f "$KDIR/$k" ] && { KIMG="$KDIR/$k"; break; }; do
 DTB="$STAGE/dtb"
 if [ "$FLAVOR" = halium ]; then
     # All base DTBs for the SoC; the bootloader picks by msm-id/board-id
-    find "$KDIR/dtbs" -name '*.dtb' -path '*qcom*' | sort | xargs cat > "$DTB"
+    find "$KDIR/dtbs" -name '*.dtb' | sort | xargs cat > "$DTB"
 else
     cp "$KDIR/dtbs/$DEVICE_MAINLINE_DTB.dtb" "$DTB" || die "missing DTB $DEVICE_MAINLINE_DTB"
 fi
@@ -121,7 +135,8 @@ else
     cat "$KIMG" "$DTB" > "$STAGE/kernel-dtb"
     MKARGS[1]="$STAGE/kernel-dtb"
 fi
-mkbootimg "${MKARGS[@]}" -o "$DEST/boot.img"
+# Ubuntu's mkbootimg imports a gki module it does not ship
+PYTHONPATH="$UCROM_ROOT/scripts/tools/pyshim" mkbootimg "${MKARGS[@]}" -o "$DEST/boot.img"
 size=$(stat -c %s "$DEST/boot.img")
 if [ -n "${DEVICE_BOOT_PARTITION_SIZE:-}" ] && [ "$size" -gt "$DEVICE_BOOT_PARTITION_SIZE" ]; then
     die "boot.img ($size) larger than boot partition ($DEVICE_BOOT_PARTITION_SIZE)"
@@ -140,9 +155,15 @@ log "creating userdata image"
 raw="$STAGE/userdata.raw"
 if [ "$FLAVOR" = halium ]; then
     # Halium file layout: /rootfs.img on userdata (found by the initramfs)
+    # Sized to its content plus headroom (not a fixed 8 GB): mke2fs -d fills
+    # the file, so a mostly empty fixed-size image would still cost its full
+    # size inside userdata. First boot grows it (ucrom-grow-userdata.service).
     rootimg="$STAGE/rootfs.img"
-    truncate -s "$UCROM_ROOTFS_SIZE" "$rootimg"
+    used_mb=$(du -sxm "$MERGED" | cut -f1)
+    root_mb=$(( used_mb * 13 / 10 + 512 ))
+    truncate -s "${root_mb}M" "$rootimg"
     mkfs.ext4 -q -F -L ucrom-root -d "$MERGED" "$rootimg"
+    log "rootfs.img: ${root_mb} MB for ${used_mb} MB of files"
     mkdir -p "$STAGE/userdata-content"
     mv "$rootimg" "$STAGE/userdata-content/rootfs.img"
     # The Android side (Halium system image). It cannot be built or fetched in
@@ -156,7 +177,8 @@ if [ "$FLAVOR" = halium ]; then
         warn "no HALIUM_SYSTEM_IMAGE given: userdata.img has no Android system image yet"
         echo "halium_system=missing" > "$STAGE/halium-system"
     fi
-    truncate -s 12G "$raw"
+    ud_mb=$(( $(du -sm "$STAGE/userdata-content" | cut -f1) + 1024 ))
+    truncate -s "${ud_mb}M" "$raw"
     mkfs.ext4 -q -F -L userdata -d "$STAGE/userdata-content" "$raw"
     rm -rf "$STAGE/userdata-content"
 else
@@ -164,13 +186,18 @@ else
     mkfs.ext4 -q -F -L userdata -d "$MERGED" "$raw"
 fi
 umount "$MERGED"
+# Disk-frugal: hash the raw image, keep only the sparse one, then prove the
+# sparse image expands back to the identical filesystem.
+raw_sha=$(sha256sum "$raw" | cut -d' ' -f1)
 img2simg "$raw" "$DEST/userdata.img"
+rm -f "$raw"
+rm -rf "$STAGE/upper" "$STAGE/work"
 
 # --- validation (recorded; tests read it for images not kept on disk)
 {
     echo "userdata_sparse_bytes=$(stat -c %s "$DEST/userdata.img")"
     simg2img "$DEST/userdata.img" "$STAGE/check.raw"
-    if cmp -s "$raw" "$STAGE/check.raw"; then echo "sparse_roundtrip=ok"; else echo "sparse_roundtrip=FAIL"; fi
+    if [ "$(sha256sum "$STAGE/check.raw" | cut -d' ' -f1)" = "$raw_sha" ]; then echo "sparse_roundtrip=ok"; else echo "sparse_roundtrip=FAIL"; fi
     if e2fsck -fn "$STAGE/check.raw" >/dev/null 2>&1; then echo "e2fsck=ok"; else echo "e2fsck=FAIL"; fi
     if [ "$FLAVOR" = halium ]; then
         cat "$STAGE/halium-system"
@@ -179,7 +206,7 @@ img2simg "$raw" "$DEST/userdata.img"
         debugfs -R "cat /etc/os-release" "$STAGE/check.raw" 2>/dev/null | grep -q '^ID=ucrom' && echo "rootfs_os_release=ok" || echo "rootfs_os_release=FAIL"
     fi
 } > "$DEST/VALIDATION"
-rm -f "$raw" "$STAGE/check.raw"
+rm -f "$STAGE/check.raw"
 cat "$DEST/VALIDATION"
 
 (cd "$DEST" && sha256sum ./*.img > SHA256SUMS)

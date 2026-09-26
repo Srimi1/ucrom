@@ -1,14 +1,33 @@
-# userdata.img is flashed as a 12 GB filesystem; grow it to the whole
-# userdata partition (115 GB on the 7T Pro) on first boot, online.
+# userdata.img is flashed at just the size of its content. On first boot,
+# grow userdata to the whole partition (115 GB on the 7T Pro), then grow the
+# root filesystem file on it (/rootfs.img, loop-mounted as /), both online.
+cat > /usr/sbin/ucrom-grow-userdata <<'EOT'
+#!/bin/sh
+set -e
+resize2fs /dev/disk/by-partlabel/userdata
+# the loop device behind / and its backing file on userdata
+loop=$(findmnt -no SOURCE /)
+case "$loop" in /dev/loop*) ;; *) exit 0 ;; esac
+file=$(losetup -nO BACK-FILE "$loop")
+[ -f "$file" ] || exit 0
+free_kb=$(df -Pk "$(dirname "$file")" | awk 'NR==2 {print $4}')
+# leave 25% of the free space on userdata for the Android side and user data
+grow_kb=$(( free_kb * 3 / 4 ))
+[ "$grow_kb" -gt 1048576 ] || exit 0
+truncate -s +"${grow_kb}K" "$file"
+losetup -c "$loop"
+resize2fs "$loop"
+EOT
+chmod 755 /usr/sbin/ucrom-grow-userdata
 cat > /usr/lib/systemd/system/ucrom-grow-userdata.service <<'EOT'
 [Unit]
-Description=ucrom: grow the userdata filesystem to the full partition (first boot)
+Description=ucrom: grow userdata and the root filesystem (first boot)
 ConditionPathExists=!/var/lib/ucrom/userdata-grown
 ConditionPathExists=/dev/disk/by-partlabel/userdata
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/resize2fs /dev/disk/by-partlabel/userdata
+ExecStart=/usr/sbin/ucrom-grow-userdata
 ExecStartPost=/bin/sh -c 'mkdir -p /var/lib/ucrom && touch /var/lib/ucrom/userdata-grown'
 
 [Install]

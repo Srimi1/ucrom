@@ -11,7 +11,11 @@ cat > /etc/hosts <<EOT
 ::1 localhost ip6-localhost ip6-loopback
 EOT
 
-# /etc/os-release is what Settings > About and every tool reads
+# /etc/os-release is what Settings > About and every tool reads. Divert
+# base-files' copy first so package upgrades never undo the branding.
+if ! dpkg-divert --list /usr/lib/os-release | grep -q ucrom; then
+    dpkg-divert --package ucrom --no-rename --divert /usr/lib/os-release.ubuntu --add /usr/lib/os-release
+fi
 rm -f /etc/os-release
 cat > /usr/lib/os-release <<EOT
 NAME="$UCROM_NAME"
@@ -35,9 +39,3 @@ DISTRIB_RELEASE=$UCROM_VERSION
 DISTRIB_CODENAME=$UCROM_SUITE
 DISTRIB_DESCRIPTION="$UCROM_NAME $UCROM_VERSION"
 EOT
-# Keep apt from undoing the branding on base-files upgrades
-if ! dpkg-divert --list /usr/lib/os-release | grep -q ucrom; then
-    cp /usr/lib/os-release /tmp/ucrom-os-release
-    dpkg-divert --package ucrom --rename --divert /usr/lib/os-release.ubuntu --add /usr/lib/os-release
-    cp /tmp/ucrom-os-release /usr/lib/os-release
-fi

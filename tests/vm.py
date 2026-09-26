@@ -30,9 +30,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "out" / "qemu"
 
-# 1440x3120 (OnePlus 7T Pro) scaled by 3/8 -> 540x1170, same aspect ratio
-SCREEN_W = int(os.environ.get("UCROM_VM_W", "540"))
-SCREEN_H = int(os.environ.get("UCROM_VM_H", "1170"))
+# 1440x3120 (OnePlus 7T Pro) scaled by 1/2 -> 720x1560, same aspect ratio.
+# The compositor may pick another mode; PhoneVM.w/h follow the real screen
+# (read from every screenshot) and touch coordinates are scaled to it.
+SCREEN_W = int(os.environ.get("UCROM_VM_W", "720"))
+SCREEN_H = int(os.environ.get("UCROM_VM_H", "1560"))
 ABS_MAX = 0x7FFF  # QEMU absolute axis range
 
 USER = "ucrom"
@@ -78,8 +80,8 @@ class QMP:
             raise VMError(f"bad QMP greeting: {greeting}")
         self.cmd("qmp_capabilities")
 
-    def cmd(self, name: str, **args):
-        msg = {"execute": name}
+    def cmd(self, _command: str, **args):
+        msg = {"execute": _command}
         if args:
             msg["arguments"] = args
         self.s.send(msg)
@@ -89,7 +91,7 @@ class QMP:
                 self.events.append(r)
                 continue
             if "error" in r:
-                raise VMError(f"QMP {name}: {r['error']}")
+                raise VMError(f"QMP {_command}: {r['error']}")
             return r.get("return")
 
 
@@ -162,6 +164,7 @@ class PhoneVM:
         self.tracking_id = 1
         self.usb_devices: list[str] = []
         self.shots = 0
+        self.w, self.h = SCREEN_W, SCREEN_H
 
     # ---------------------------------------------------------------- lifecycle
     def start(self) -> None:
@@ -303,42 +306,54 @@ class PhoneVM:
                 break
             time.sleep(0.1)
         time.sleep(0.2)
+        try:
+            from PIL import Image
+            with Image.open(path) as im:
+                self.w, self.h = im.size
+        except Exception:
+            pass
         return path
 
-    def ocr(self, png: Path, psm: int = 11) -> str:
-        """Read text on screen with tesseract (upscaled for small UI text)."""
-        big = png.with_suffix(".ocr.png")
-        subprocess.run(
-            ["python3", "-c",
-             "import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert('L');"
-             "im=im.resize((im.width*3,im.height*3));im.save(sys.argv[2])", str(png), str(big)],
-            check=True,
-        )
-        r = subprocess.run(
-            ["tesseract", str(big), "-", "--psm", str(psm)],
-            capture_output=True, text=True, check=False,
-        )
-        big.unlink(missing_ok=True)
+    @staticmethod
+    def _prep(png: Path, out: Path, scale: int = 1, box=None, threshold: int = 0) -> None:
+        """Grayscale, crop, invert dark screens (tesseract wants dark text
+        on light), optionally upscale. `threshold` keeps only near-white
+        text (as black on white): for light labels on grey keys."""
+        from PIL import Image, ImageOps, ImageStat
+        im = Image.open(png).convert("L")
+        if box:
+            im = im.crop(box)
+        if threshold:
+            im = im.point(lambda v: 0 if v > threshold else 255)
+        elif ImageStat.Stat(im).mean[0] < 128:
+            im = ImageOps.invert(im)
+        if scale != 1:
+            im = im.resize((im.width * scale, im.height * scale))
+        im.save(out)
+
+    def ocr(self, png: Path, psm: int = 11, box=None, scale: int = 1, threshold: int = 0) -> str:
+        """Read text on screen with tesseract."""
+        prep = png.with_suffix(".ocr.png")
+        self._prep(png, prep, scale, box, threshold)
+        r = subprocess.run(["tesseract", str(prep), "-", "--psm", str(psm)],
+                           capture_output=True, text=True, check=False)
+        prep.unlink(missing_ok=True)
         return r.stdout
 
-    def find_text(self, png: Path, pattern: str, scale: int = 3):
+    def find_text(self, png: Path, pattern: str, scale: int = 1, case: bool = False, min_conf: float = 30,
+                  threshold: int = 0):
         """Locate text on screen (tesseract TSV). Returns (x, y) centre in
         screen pixels of the first word/phrase matching the regex, or None."""
         import csv
         import re
-        big = png.with_suffix(".find.png")
-        subprocess.run(
-            ["python3", "-c",
-             "import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert('L');"
-             f"im=im.resize((im.width*{scale},im.height*{scale}));im.save(sys.argv[2])", str(png), str(big)],
-            check=True,
-        )
-        r = subprocess.run(["tesseract", str(big), "-", "--psm", "11", "tsv"],
+        prep = png.with_suffix(".find.png")
+        self._prep(png, prep, scale, threshold=threshold)
+        r = subprocess.run(["tesseract", str(prep), "-", "--psm", "11", "tsv"],
                            capture_output=True, text=True, check=False)
-        big.unlink(missing_ok=True)
+        prep.unlink(missing_ok=True)
         rows = list(csv.DictReader(r.stdout.splitlines(), delimiter="\t", quoting=csv.QUOTE_NONE))
-        words = [w for w in rows if w.get("text", "").strip() and float(w.get("conf", -1)) > 30]
-        rx = re.compile(pattern, re.I)
+        words = [w for w in rows if w.get("text", "").strip() and float(w.get("conf", -1)) > min_conf]
+        rx = re.compile(pattern, 0 if case else re.I)
         # single words first, then adjacent pairs on the same line
         for w in words:
             if rx.fullmatch(w["text"].strip()):
@@ -350,6 +365,11 @@ class PhoneVM:
                     x2 = int(b["left"]) + int(b["width"]); y2 = int(b["top"]) + int(b["height"])
                     return ((x1 + x2) / 2 / scale, (y1 + y2) / 2 / scale)
         return None
+
+    def read_char(self, png: Path, x: float, y: float, half: int = 45, threshold: int = 0) -> str:
+        """OCR the single character around (x, y) (e.g. a keypad key)."""
+        box = (int(x - half), int(y - half), int(x + half), int(y + half))
+        return self.ocr(png, psm=10, box=box, scale=2, threshold=threshold).strip()
 
     @staticmethod
     def _centre(w, scale):
@@ -390,8 +410,8 @@ class PhoneVM:
     def _pos(self, slot: int, tid: int, x: float, y: float) -> list[dict]:
         return [
             self._mtt("update", slot, tid),
-            self._mtt("data", slot, tid, "x", self._abs(x, SCREEN_W)),
-            self._mtt("data", slot, tid, "y", self._abs(y, SCREEN_H)),
+            self._mtt("data", slot, tid, "x", self._abs(x, self.w)),
+            self._mtt("data", slot, tid, "y", self._abs(y, self.h)),
         ]
 
     def _send(self, events: list[dict]) -> None:
@@ -417,7 +437,8 @@ class PhoneVM:
         self._send(events)
 
     def touch_up(self, tids: list[int]) -> None:
-        events = [self._mtt("end", slot, tid) for slot, tid in enumerate(tids)]
+        # Linux multitouch: a lifted contact reports ABS_MT_TRACKING_ID = -1
+        events = [self._mtt("end", slot, -1) for slot, _tid in enumerate(tids)]
         events.append({"type": "btn", "data": {"button": "touch", "down": False}})
         self._send(events)
 
@@ -454,7 +475,7 @@ class PhoneVM:
     def type_on_hardware_keyboard(self, text: str) -> None:
         events = []
         for ch in text:
-            code = {" ": "spc", "\n": "ret"}.get(ch, ch.lower())
+            code = {" ": "spc", "\n": "ret", "-": "minus", "/": "slash", ".": "dot"}.get(ch, ch.lower())
             for down in (True, False):
                 events.append({"type": "key", "data": {"down": down, "key": {"type": "qcode", "data": code}}})
         self._send(events)

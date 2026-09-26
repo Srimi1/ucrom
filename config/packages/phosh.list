@@ -14,3 +14,18 @@ adwaita-icon-theme
 gir1.2-adw-1
 gir1.2-gtk-4.0
 wlr-randr
+# Session pieces phosh-session needs (Recommends we install explicitly)
+gnome-session-bin
+gnome-session-common
+dconf-gsettings-backend
+gnome-keyring
+libpam-gnome-keyring
+fonts-cantarell
+gnome-backgrounds
+gvfs-backends
+gvfs-fuse
+xdg-desktop-portal-wlr
+phosh-mobile-tweaks
+# SVG icons (Adwaita symbolic/app icons) and the accessibility bus the OSK uses
+librsvg2-common
+at-spi2-core

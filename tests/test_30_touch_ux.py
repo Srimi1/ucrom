@@ -1,11 +1,16 @@
-"""Using the phone by touch only, like an Android phone."""
+"""Using the phone by touch only, like an Android phone.
+
+Every action is a touch gesture sent to the virtio multitouch screen; results
+are read back from the screen with OCR. The guest agent is only used to set
+up (lock the phone, list favourites) and to check processes.
+"""
 
 import time
 
 import pytest
 
 import ui
-from vm import SCREEN_H, SCREEN_W
+from vm import VMError
 
 pytestmark = pytest.mark.vm
 
@@ -14,75 +19,135 @@ def test_unlock_with_pin_pad(phone, evidence):
     """Swipe up, tap the PIN on the pad, phone unlocks"""
     ui.wait_shell_ready(phone)
     if not ui.is_locked(phone):
-        phone.sh("gdbus call --session -d org.gnome.ScreenSaver -o /org/gnome/ScreenSaver "
-                 "-m org.gnome.ScreenSaver.SetActive true", user=True)
-        time.sleep(4)
+        ui.lock(phone)
+        time.sleep(6)
     assert ui.is_locked(phone)
+    t = time.time()
     ui.unlock(phone, evidence)
+    evidence.note(f"unlocked by touch in {time.time() - t:.0f} s")
     evidence.screenshot(phone, "home")
     assert not ui.is_locked(phone)
 
 
 def test_calculator_by_touch(phone, evidence):
     """Open Calculator from the app grid and compute 7 × 6 by tapping"""
-    ui.open_app(phone, evidence, "Calculator", "gnome-calculator")
-    shot = evidence.screenshot(phone, "calculator")
-    for key in ("7", "[×x*]", "6", "="):
-        pos = phone.find_text(shot, key)
-        assert pos, f"calculator key {key} not found"
-        phone.tap(*pos)
-        time.sleep(1)
-    time.sleep(2)
-    res = evidence.screenshot(phone, "result")
-    text = phone.ocr(res)
-    evidence.note("screen text after 7 × 6 =: " + " ".join(text.split())[:200])
-    assert "42" in text
-    assert ui.close_app(phone, "gnome-calculator"), "swipe-to-close failed"
-    evidence.note("closed with a swipe in the overview")
+    ui.open_favorite(phone, evidence, "org.gnome.Calculator.desktop", "gnome-calculator", r"Basic|Undo")
+    try:
+        _calculate(phone, evidence)
+    finally:
+        closed = ui.close_app(phone, "gnome-calculator")
+    assert closed, "swipe-to-close failed"
+    evidence.note("closed by swiping its card away in the overview")
+
+
+def _find_keypad(phone, shot, k):
+    """Locate the keypad by its "mod" key, once it is fully clear of the
+    on-screen keyboard. With the keyboard up, Calculator moves its keypad
+    above it, but the keyboard can slide in (and the keypad move) late."""
+    last = None
+    for i in range(15):
+        phone.screenshot(shot)
+        pos = phone.find_text(shot, "mod", case=True)
+        osk = phone.find_text(shot, "English|Terminal", case=True, threshold=190)
+        covered = bool(pos and osk and osk[1] - 330 * k < pos[1] + 390 * k)
+        if pos and not covered and last and abs(pos[1] - last[1]) < 5:
+            return pos
+        if covered and i in (5, 10):
+            # nudge: tapping the entry makes the app re-fit above the keyboard
+            phone.tap(phone.w / 2, pos[1] - 150 * k, hold=0.1)
+        last = pos
+        time.sleep(2)
+    return None
+
+
+def _calculate(phone, evidence):
+    k = phone.h / 1440
+    for attempt in range(3):
+        shot = evidence.shot_path("calculator")
+        read = []
+        for key in ("C", "7", "x", "6", "="):
+            # find the keypad again before every tap: it moves when the
+            # on-screen keyboard comes or goes
+            mod = _find_keypad(phone, shot, k)
+            assert mod, "calculator keypad not visible"
+            dx, dy = ui.CALC_KEYS[key]
+            x, y = mod[0] + dx * k, mod[1] + dy * k
+            read.append(f"{key}->{phone.read_char(shot, x, y)!r}")
+            phone.tap(x, y, hold=0.12)
+            time.sleep(1.2)
+        evidence.rec["shots"].append({"file": str(shot.relative_to(shot.parent.parent)), "label": "calculator"})
+        evidence.note("calculator keys located from the 'mod' button, read back by OCR: " + ", ".join(read))
+        try:
+            res = ui.wait_for_text(phone, evidence, r"42", timeout=30, label="result")
+        except VMError:
+            evidence.note(f"attempt {attempt + 1}: no 42 on screen, entering the sum again")
+            continue
+        evidence.note("display: " + " ".join(phone.ocr(res, box=(0, int(150 * k), phone.w, int(520 * k))).split()))
+        return
+    raise AssertionError("calculator never showed 42")
 
 
 def test_on_screen_keyboard_typing(phone, evidence):
     """Type text using only on-screen keyboard taps"""
-    ui.open_app(phone, evidence, "Text Editor", "gnome-text-editor")
-    phone.tap(SCREEN_W / 2, SCREEN_H * 0.35)   # focus the document
-    time.sleep(4)
-    kb = evidence.screenshot(phone, "osk-shown")
-    osk = phone.sh("pgrep -f phosh-osk-stub >/dev/null && echo yes").out.strip()
-    evidence.note(f"on-screen keyboard process running: {osk or 'no'}")
-    for ch in "ucrom":
-        pos = phone.find_text(kb, ch)
-        assert pos, f"key '{ch}' not found on the on-screen keyboard"
-        phone.tap(*pos)
-        time.sleep(0.6)
-    time.sleep(2)
+    ui.open_favorite(phone, evidence, "org.gnome.Console.desktop", "kgx", r"ucrom@|\$|~")
+    try:
+        _type_in_console(phone, evidence)
+    finally:
+        closed = ui.close_app(phone, "kgx", gone=ui.KGX_CLOSED)
+    assert closed, "swipe-to-close failed"
+
+
+def _type_in_console(phone, evidence):
+    phone.tap(phone.w / 2, phone.h * 0.25, hold=0.12)      # focus the terminal
+    # key labels are light grey-on-grey: OCR them with a white-text threshold
+    kb = ui.wait_for_text(phone, evidence, r"English|Terminal", timeout=60, label="osk", threshold=190)
+    layout = next((n for n in ui.OSK_LAYOUTS if phone.find_text(kb, n, case=True, threshold=190)), None)
+    assert layout, "on-screen keyboard not shown"
+    space = phone.find_text(kb, layout, case=True, threshold=190)
+    evidence.note(f"on-screen keyboard layout: {layout}")
+    word = "ucrom"
+    read = []
+    for ch in word:
+        x, y = ui.osk_key(phone, space, ch, layout)
+        read.append(f"{ch}->{phone.read_char(kb, x, y, half=26, threshold=190)!r}")
+        phone.tap(x, y, hold=0.12)
+        time.sleep(0.8)
+    evidence.note("keys read back by OCR: " + ", ".join(read))
+    time.sleep(3)
     typed = evidence.screenshot(phone, "typed")
-    text = phone.ocr(typed).lower()
-    evidence.note("screen text: " + " ".join(text.split())[:200])
-    assert "ucrom" in text
-    phone.sh("pkill -f gnome-text-editor; true")
+    text = phone.ocr(typed, box=(0, 0, phone.w, int(phone.h * 0.55))).lower()
+    evidence.note("terminal text: " + " ".join(text.split())[:200])
+    assert word in text
 
 
 def test_quick_settings_swipe(phone, evidence):
     """Swipe down from the top opens quick settings"""
-    phone.swipe(SCREEN_W / 2, 3, SCREEN_W / 2, SCREEN_H * 0.6, duration=0.4)
-    time.sleep(3)
+    phone.swipe(phone.w / 2, 3, phone.w / 2, phone.h * 0.9, duration=1.0, steps=25)
+    time.sleep(6)
     shot = evidence.screenshot(phone, "quick-settings")
     text = phone.ocr(shot)
     evidence.note("quick settings text: " + " ".join(text.split())[:200])
-    assert any(w in text for w in ("Wi-Fi", "WiFi", "Bluetooth", "Battery", "Airplane", "Torch", "Rotation"))
-    phone.swipe(SCREEN_W / 2, SCREEN_H * 0.6, SCREEN_W / 2, 3, duration=0.4)
-    time.sleep(2)
+    # quick-setting tiles only (app names like "Mobile Settings" do not count)
+    tiles = [w for w in ("Wi-Fi", "WiFi", "Bluetooth", "Battery", "Airplane", "Torch",
+                         "Portrait", "Landscape", "Rotation", "VPN", "Location", "Do Not Disturb")
+             if w in text]
+    evidence.note(f"quick-setting tiles seen: {tiles}")
+    assert len(tiles) >= 2
+    phone.swipe(phone.w / 2, phone.h * 0.6, phone.w / 2, 3, duration=0.5, steps=12)
+    time.sleep(3)
 
 
 def test_power_button_locks(phone, evidence):
     """The phone's power button blanks and locks the screen (never shuts down)"""
     assert not ui.is_locked(phone)
     phone.power_button()
-    phone.wait_until(ui.SS + " | grep -q true", timeout=30, interval=1, user=True)
-    time.sleep(2)
+    time.sleep(6)
+    deadline = time.time() + 60
+    while not ui.is_locked(phone) and time.time() < deadline:
+        time.sleep(3)
     evidence.screenshot(phone, "after-power-button")
+    assert ui.is_locked(phone)
     assert phone.sh("systemctl is-system-running").out.strip() in ("running", "degraded")
-    evidence.note("locked, system still running")
-    phone.power_button()      # wake
-    time.sleep(3)
+    evidence.note("locked; the system kept running (logind ignores the power key)")
     ui.unlock(phone, evidence)
+    assert not ui.is_locked(phone)

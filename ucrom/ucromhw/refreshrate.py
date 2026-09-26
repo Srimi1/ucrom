@@ -3,7 +3,7 @@
 Reads the wanted rate from ~/.config/ucrom/refresh-rate (written by
 Settings/Hardware Check, default: the highest the device profile lists) and
 applies it to the built-in panel with wlr-randr, picking the output mode with
-the panel's resolution and the closest refresh rate.
+the panel's current resolution and the closest refresh rate.
 """
 
 import argparse
@@ -32,9 +32,12 @@ def parse_modes(text):
 
 
 def pick(modes, want_hz):
+    """Only the refresh rate changes: keep the panel's current resolution
+    (outputs can list far larger modes than the panel really has)."""
     if not modes:
         return None
-    w, h = max(((m[0], m[1]) for m in modes), key=lambda wh: wh[0] * wh[1])
+    current = [m for m in modes if m[3]]
+    w, h = (current[0][0], current[0][1]) if current else (modes[0][0], modes[0][1])
     same = [m for m in modes if (m[0], m[1]) == (w, h)]
     return min(same, key=lambda m: abs(m[2] - want_hz))
 

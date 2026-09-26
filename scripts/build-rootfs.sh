@@ -27,6 +27,14 @@ run_hooks() {
     local stage=$1 hook
     mkdir -p "$ROOT/tmp/ucrom-hooks"
     cp "$UCROM_ROOT"/config/ucrom.conf "$ROOT/tmp/ucrom-hooks/ucrom.conf"
+    # Downloads happen on the host (fast, retried) and are handed to hooks
+    local node_tar="node-v$UCROM_NODE_VERSION-linux-arm64.tar.xz"
+    mkdir -p "$BUILD_DIR/cache"
+    if ! echo "$UCROM_NODE_SHA256  $BUILD_DIR/cache/$node_tar" | sha256sum -c - >/dev/null 2>&1; then
+        retry 5 curl -fsSL -o "$BUILD_DIR/cache/$node_tar" \
+            "https://nodejs.org/dist/v$UCROM_NODE_VERSION/$node_tar"
+    fi
+    cp "$BUILD_DIR/cache/$node_tar" "$ROOT/tmp/ucrom-hooks/"
     for hook in "$UCROM_ROOT"/rootfs/hooks/"$stage"-*.chroot; do
         [ -e "$hook" ] || continue
         log "hook: $(basename "$hook")"
@@ -48,6 +56,11 @@ install_ucrom_files() {
 
 build_common() {
     ensure_arm64_exec
+    # UCROM_RESUME=1: keep an already bootstrapped tree (e.g. after a hook
+    # failed) and only redo package installation and configuration
+    if [ "${UCROM_RESUME:-0}" = 1 ] && [ -x "$ROOT/usr/bin/apt-get" ]; then
+        log "resuming in existing $ROOT"
+    else
     rm -rf "$ROOT"; mkdir -p "$ROOT"
     log "bootstrapping Ubuntu $UCROM_SUITE $UCROM_ARCH from $UCROM_MIRROR"
     retry 3 mmdebstrap --mode=root --variant=minbase --arch="$UCROM_ARCH" \
@@ -59,6 +72,7 @@ build_common() {
         "deb $UCROM_MIRROR $UCROM_SUITE ${UCROM_COMPONENTS//,/ }" \
         "deb $UCROM_MIRROR $UCROM_SUITE-updates ${UCROM_COMPONENTS//,/ }" \
         "deb $UCROM_MIRROR $UCROM_SUITE-security ${UCROM_COMPONENTS//,/ }"
+    fi
 
     chroot_mount "$ROOT"
     build_ca_install "$ROOT"
