@@ -72,6 +72,15 @@ build_one() {
         [ -e "$p" ] || continue
         git -C "$CHROOT$src" apply "$p" >>"$log" 2>&1 || { set_status "$name" FAIL - "patch $(basename "$p") failed"; return 1; }
     done
+    # Some forks rename the source package in debian/control but not in the
+    # changelog; dpkg-source refuses the mismatch. Align the changelog name.
+    local ctl_src chl_src
+    ctl_src=$(sed -n 's/^Source:[[:space:]]*//p' "$CHROOT$src/debian/control" | head -1)
+    chl_src=$(head -1 "$CHROOT$src/debian/changelog" | cut -d' ' -f1)
+    if [ -n "$ctl_src" ] && [ "$ctl_src" != "$chl_src" ]; then
+        sed -i "1s/^$chl_src /$ctl_src /" "$CHROOT$src/debian/changelog"
+        echo "ucrom: changelog source name $chl_src -> $ctl_src" >>"$log"
+    fi
     # Old Mer/Sailfish-style packaging asks for debhelper compat < 7, which
     # current debhelper refuses. Raise it to 10 (a packaging-only change).
     local compat="$CHROOT$src/debian/compat"
@@ -86,8 +95,7 @@ build_one() {
     fi
     if ! chroot_run "$CHROOT" sh -c "cd $src && DEB_BUILD_OPTIONS='nocheck parallel=$(nproc)' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1 &&
        ! { echo "ucrom: parallel build failed, retrying with one job (make ordering races)" >>"$log";
-           chroot_run "$CHROOT" sh -c "cd $src && git clean -fdxq -e debian && git checkout -q -- . && \
-               { [ ! -f debian/compat ] || [ \$(tr -dc 0-9 < debian/compat) -ge 10 ] || echo 10 > debian/compat; } && \
+           chroot_run "$CHROOT" sh -c "cd $src && git clean -fdxq -e debian && \
                DEB_BUILD_OPTIONS='nocheck parallel=1' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1; }; then
         local why; why=$(grep -iE "error" "$log" | tail -2 | tr '\n' ' ' | cut -c1-200)
         set_status "$name" FAIL "$commit" "build: $why"; return 1
