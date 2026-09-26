@@ -43,15 +43,21 @@ def test_calculator_by_touch(phone, evidence):
 def _calculate(phone, evidence):
     shot = evidence.shot_path("calculator")
     k = phone.h / 1440
-    # The window re-lays out when the on-screen keyboard slides in: wait
-    # until the keypad ("mod" row) sits still in the upper part of the screen
+    # With the on-screen keyboard up, Calculator moves its keypad above it,
+    # but only after a moment. Wait until the "mod" row sits still and the
+    # whole keypad (down to its "0" row) is clear of the keyboard.
     mod, last = None, None
-    for _ in range(12):
+    for i in range(15):
         phone.screenshot(shot)
         pos = phone.find_text(shot, "mod", case=True)
-        if pos and pos[1] < phone.h * 0.6 and last and abs(pos[1] - last[1]) < 5:
+        osk = phone.find_text(shot, "English|Terminal", case=True, threshold=190)
+        covered = bool(pos and osk and osk[1] - 330 * k < pos[1] + 390 * k)
+        if pos and not covered and last and abs(pos[1] - last[1]) < 5:
             mod = pos
             break
+        if covered and i in (5, 10):
+            # nudge: tapping the entry makes the app re-fit above the keyboard
+            phone.tap(phone.w / 2, pos[1] - 150 * k, hold=0.1)
         last = pos
         time.sleep(3)
     assert mod, f"calculator keypad not visible (last 'mod' at {last})"
