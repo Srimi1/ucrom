@@ -1,0 +1,12 @@
+device=oneplus-hotdog
+name=OnePlus 7T Pro / 7T Pro McLaren Edition
+soc=sm8150 (Snapdragon 855/855+)
+flavor=halium
+repo=https://github.com/LineageOS/android_kernel_oneplus_sm8150
+ref=lineage-20
+commit=2947e6b4dc5f778307b138cd382db103419c4bcb
+release=4.14.180-perf+
+compiler=Ubuntu clang version 18.1.3 (1ubuntu1)
+fragments=halium.config kernel-touch-only.config
+fragment_mismatches=0
+targets=all

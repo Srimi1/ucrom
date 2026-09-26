@@ -4,6 +4,8 @@ ucrom is a custom operating system for OnePlus phones. It replaces Android with 
 
 It is **touch only**. Keyboards, mice and touchpads are switched off inside the Linux kernel the moment they connect, over USB or Bluetooth. Only the touchscreen and the phone's own buttons work.
 
+**Picking this up from a clone or a zip?** Start with [docs/STATUS.md](docs/STATUS.md): what is done, what is proven, what is open, and the commands to continue.
+
 Main target: **OnePlus 7T Pro McLaren Edition** (also the regular 7T Pro, codename `hotdog`, Snapdragon 855+). The same OS adapts to other OnePlus phones from the Snapdragon 820 up to the 888, with Snapdragon 8 Gen 1/2/3 phones as experimental profiles.
 
 > Status, plainly: ucrom is built and tested end to end in an emulated arm64 phone, and the 7T Pro kernel and boot images are built and checked. It has **not been run on a real 7T Pro yet**. The phone's own drivers can only be proven on the phone, which is what the built-in Hardware Check app is for. See [What is proven and what is not](#what-is-proven-and-what-is-not).
@@ -82,7 +84,7 @@ Only provable on a real phone: that the phone's drivers respond (display, modem,
 
 ## Documentation
 
-[Architecture](docs/ARCHITECTURE.md) · [Building](docs/BUILDING.md) · [Flashing](docs/FLASHING.md) · [Touch only](docs/TOUCH_ONLY.md) · [Devices](docs/DEVICES.md) · [Apps and AI agents](docs/APPS.md) · [Hardware Check](docs/HARDWARE_CHECK.md) · [Testing](docs/TESTING.md)
+[Status and hand-off](docs/STATUS.md) · [Plan](docs/PLAN.md) · [Architecture](docs/ARCHITECTURE.md) · [Building](docs/BUILDING.md) · [Flashing](docs/FLASHING.md) · [Touch only](docs/TOUCH_ONLY.md) · [Devices](docs/DEVICES.md) · [Apps and AI agents](docs/APPS.md) · [Hardware Check](docs/HARDWARE_CHECK.md) · [Testing](docs/TESTING.md)
 
 ## License
 
