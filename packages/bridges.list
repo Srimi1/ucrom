@@ -8,7 +8,9 @@ android-headers-30            https://github.com/droidian/android-headers-30    
 libhybris                     https://github.com/droidian/libhybris                    bookworm
 halium-wrappers               https://github.com/droidian/halium-wrappers              bookworm
 parse-android-dynparts        https://github.com/droidian/parse-android-dynparts       bookworm
+lxc-android                   https://github.com/droidian/lxc-android                  bookworm
 initramfs-tools-halium        https://github.com/droidian/initramfs-tools-halium       droidian
+libdroid                      https://github.com/droidian/libdroid                     droidian
 wlroots                       https://github.com/droidian/wlroots                      feature/next/upgrade-0-17-4
 phoc                          https://github.com/droidian/phoc                         feature/next/upgrade-0.40.0
 bluebinder                    https://github.com/droidian/bluebinder                   bookworm
@@ -27,4 +29,3 @@ batman                        https://github.com/droidian/batman                
 sensorfw                      https://github.com/droidian/sensorfw                     bookworm
 nfcd                          https://github.com/droidian/nfcd                         bookworm
 nfcd-binder-plugin            https://github.com/droidian/nfcd-binder-plugin           bookworm
-lxc-android                   https://github.com/droidian/lxc-android                  bookworm

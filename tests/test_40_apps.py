@@ -31,7 +31,8 @@ def online(phone):
             phone.sh("update-ca-certificates >/dev/null 2>&1")
         phone.sh("printf '%s\\n' " + " ".join(f"'{e}'" for e in env) + " >> /etc/environment")
         phone.sh("systemctl restart phosh.service")
-        time.sleep(20)
+        time.sleep(10)
+        ui.wait_shell_ready(phone)   # the restarted shell comes back locked
     r = phone.sh(". /etc/environment 2>/dev/null; export https_proxy HTTPS_PROXY; "
                  "curl -sS -o /dev/null -w '%{http_code}' https://registry.npmjs.org/", timeout=90)
     if r.out.strip() not in ("200", "301", "302"):
@@ -40,6 +41,9 @@ def online(phone):
 
 
 def open_hub(phone, evidence):
+    ui.ensure_lit(phone)
+    if ui.is_locked(phone):
+        ui.unlock(phone, evidence)
     ui.open_favorite(phone, evidence, "io.ucrom.AppHub.desktop", "apphub.py", r"App Hub|Install|Claude")
 
 
@@ -78,8 +82,6 @@ def install_and_open(phone, evidence, app_label, app_id, process, timeout=1500):
 
 def test_app_hub_opens(phone, online, evidence):
     """App Hub opens from the app grid by touch"""
-    if ui.is_locked(phone):
-        ui.unlock(phone, evidence)
     open_hub(phone, evidence)
     evidence.screenshot(phone, "app-hub")
 

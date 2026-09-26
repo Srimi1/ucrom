@@ -40,48 +40,51 @@ def test_calculator_by_touch(phone, evidence):
     evidence.note("closed by swiping its card away in the overview")
 
 
-def _calculate(phone, evidence):
-    shot = evidence.shot_path("calculator")
-    k = phone.h / 1440
-    # With the on-screen keyboard up, Calculator moves its keypad above it,
-    # but only after a moment. Wait until the "mod" row sits still and the
-    # whole keypad (down to its "0" row) is clear of the keyboard.
-    mod, last = None, None
+def _find_keypad(phone, shot, k):
+    """Locate the keypad by its "mod" key, once it is fully clear of the
+    on-screen keyboard. With the keyboard up, Calculator moves its keypad
+    above it, but the keyboard can slide in (and the keypad move) late."""
+    last = None
     for i in range(15):
         phone.screenshot(shot)
         pos = phone.find_text(shot, "mod", case=True)
         osk = phone.find_text(shot, "English|Terminal", case=True, threshold=190)
         covered = bool(pos and osk and osk[1] - 330 * k < pos[1] + 390 * k)
         if pos and not covered and last and abs(pos[1] - last[1]) < 5:
-            mod = pos
-            break
+            return pos
         if covered and i in (5, 10):
             # nudge: tapping the entry makes the app re-fit above the keyboard
             phone.tap(phone.w / 2, pos[1] - 150 * k, hold=0.1)
         last = pos
-        time.sleep(3)
-    assert mod, f"calculator keypad not visible (last 'mod' at {last})"
-    evidence.rec["shots"].append({"file": str(shot.relative_to(shot.parent.parent)), "label": "calculator"})
-    read = []
-    for key in ("C", "7", "x", "6", "="):
-        dx, dy = ui.CALC_KEYS[key]
-        x, y = mod[0] + dx * k, mod[1] + dy * k
-        read.append(f"{key}->{phone.read_char(shot, x, y)!r}")
-        phone.tap(x, y, hold=0.12)
-        time.sleep(1.2)
-    evidence.note("calculator keys located from the 'mod' button, read back by OCR: " + ", ".join(read))
-    res = None
+        time.sleep(2)
+    return None
+
+
+def _calculate(phone, evidence):
+    k = phone.h / 1440
     for attempt in range(3):
+        shot = evidence.shot_path("calculator")
+        read = []
+        for key in ("C", "7", "x", "6", "="):
+            # find the keypad again before every tap: it moves when the
+            # on-screen keyboard comes or goes
+            mod = _find_keypad(phone, shot, k)
+            assert mod, "calculator keypad not visible"
+            dx, dy = ui.CALC_KEYS[key]
+            x, y = mod[0] + dx * k, mod[1] + dy * k
+            read.append(f"{key}->{phone.read_char(shot, x, y)!r}")
+            phone.tap(x, y, hold=0.12)
+            time.sleep(1.2)
+        evidence.rec["shots"].append({"file": str(shot.relative_to(shot.parent.parent)), "label": "calculator"})
+        evidence.note("calculator keys located from the 'mod' button, read back by OCR: " + ", ".join(read))
         try:
             res = ui.wait_for_text(phone, evidence, r"42", timeout=30, label="result")
-            break
         except VMError:
-            # under emulation a tap can be dropped while the app is busy
-            dx, dy = ui.CALC_KEYS["="]
-            evidence.note(f"no result yet, tapping '=' again (attempt {attempt + 2})")
-            phone.tap(mod[0] + dx * k, mod[1] + dy * k, hold=0.12)
-    assert res, "calculator never showed 42"
-    evidence.note("display: " + " ".join(phone.ocr(res, box=(0, int(150 * k), phone.w, int(520 * k))).split()))
+            evidence.note(f"attempt {attempt + 1}: no 42 on screen, entering the sum again")
+            continue
+        evidence.note("display: " + " ".join(phone.ocr(res, box=(0, int(150 * k), phone.w, int(520 * k))).split()))
+        return
+    raise AssertionError("calculator never showed 42")
 
 
 def test_on_screen_keyboard_typing(phone, evidence):

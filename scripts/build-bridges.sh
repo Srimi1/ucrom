@@ -76,10 +76,19 @@ build_one() {
     # changelog; dpkg-source refuses the mismatch. Align the changelog name.
     local ctl_src chl_src
     ctl_src=$(sed -n 's/^Source:[[:space:]]*//p' "$CHROOT$src/debian/control" | head -1)
-    chl_src=$(head -1 "$CHROOT$src/debian/changelog" | cut -d' ' -f1)
-    if [ -n "$ctl_src" ] && [ "$ctl_src" != "$chl_src" ]; then
+    chl_src=$(head -1 "$CHROOT$src/debian/changelog" 2>/dev/null | cut -d' ' -f1)
+    if [ -n "$ctl_src" ] && [ -n "$chl_src" ] && [ "$ctl_src" != "$chl_src" ]; then
         sed -i "1s/^$chl_src /$ctl_src /" "$CHROOT$src/debian/changelog"
         echo "ucrom: changelog source name $chl_src -> $ctl_src" >>"$log"
+    fi
+    # Droidian's release tooling writes debian/changelog from git at release
+    # time, so some repos carry none. Write one from the commit.
+    if [ ! -f "$CHROOT$src/debian/changelog" ] && [ -n "$ctl_src" ]; then
+        local when; when=$(git -C "$CHROOT$src" log -1 --format=%cD)
+        printf '%s (0~git%s.%s) noble; urgency=medium\n\n  * ucrom build of %s @ %s.\n\n -- ucrom builder <builder@ucrom.invalid>  %s\n' \
+            "$ctl_src" "$(git -C "$CHROOT$src" log -1 --format=%cd --date=format:%Y%m%d)" "$commit" \
+            "$repo" "$commit" "$when" > "$CHROOT$src/debian/changelog"
+        echo "ucrom: generated debian/changelog (repo has none)" >>"$log"
     fi
     # Old Mer/Sailfish-style packaging asks for debhelper compat < 7, which
     # current debhelper refuses. Raise it to 10 (a packaging-only change).
@@ -90,7 +99,7 @@ build_one() {
     fi
     # Build-deps (from Ubuntu and from already-built bridges)
     if ! chroot_run "$CHROOT" sh -c "cd $src && mk-build-deps -i -r -t 'apt-get -y --no-install-recommends -o Debug::pkgProblemResolver=yes' debian/control" >>"$log" 2>&1; then
-        local why; why=$(grep -E "Depends:|but it is not|Unable to locate|unmet" "$log" | tail -3 | tr '\n' ' ' | cut -c1-200)
+        local why; why=$(grep -E "Broken .* Depends on|but it is not|Unable to locate|unmet" "$log" | tail -3 | tr '\n' ' ' | cut -c1-200)
         set_status "$name" FAIL "$commit" "build-deps: $why"; return 1
     fi
     if ! chroot_run "$CHROOT" sh -c "cd $src && DEB_BUILD_OPTIONS='nocheck parallel=$(nproc)' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1 &&
