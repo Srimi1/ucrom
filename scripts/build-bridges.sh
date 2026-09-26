@@ -72,6 +72,13 @@ build_one() {
         [ -e "$p" ] || continue
         git -C "$CHROOT$src" apply "$p" >>"$log" 2>&1 || { set_status "$name" FAIL - "patch $(basename "$p") failed"; return 1; }
     done
+    # Old Mer/Sailfish-style packaging asks for debhelper compat < 7, which
+    # current debhelper refuses. Raise it to 10 (a packaging-only change).
+    local compat="$CHROOT$src/debian/compat"
+    if [ -f "$compat" ] && [ "$(tr -dc 0-9 < "$compat")" -lt 10 ]; then
+        echo 10 > "$compat"
+        echo "ucrom: debian/compat raised to 10" >>"$log"
+    fi
     # Build-deps (from Ubuntu and from already-built bridges)
     if ! chroot_run "$CHROOT" sh -c "cd $src && mk-build-deps -i -r -t 'apt-get -y --no-install-recommends -o Debug::pkgProblemResolver=yes' debian/control" >>"$log" 2>&1; then
         local why; why=$(grep -E "Depends:|but it is not|Unable to locate|unmet" "$log" | tail -3 | tr '\n' ' ' | cut -c1-200)
@@ -81,7 +88,10 @@ build_one() {
         local why; why=$(grep -iE "error" "$log" | tail -2 | tr '\n' ' ' | cut -c1-200)
         set_status "$name" FAIL "$commit" "build: $why"; return 1
     fi
-    local debs; debs=$(ls "$CHROOT"/build/*.deb 2>/dev/null | grep -v -- '-build-deps_' || true)
+    local debs="" f
+    for f in "$CHROOT"/build/*.deb; do
+        case "$f" in *-build-deps_*|*'*'*) ;; *) debs="$debs $f" ;; esac
+    done
     [ -n "$debs" ] || { set_status "$name" FAIL "$commit" "no .deb produced"; return 1; }
     # shellcheck disable=SC2086
     mv $debs "$DEST/"
