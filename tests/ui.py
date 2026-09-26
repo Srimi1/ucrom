@@ -89,6 +89,39 @@ def _keys(phone, unlock_y):
     return {d: (phone.w * COL_X[KEY_COLS[d]], unlock_y - ROW_UP[KEY_ROWS[d]] * k) for d in KEY_COLS}
 
 
+def _backspace(phone, unlock_y):
+    return (phone.w * COL_X[2], unlock_y - ROW_UP[3] * phone.h / 1440)
+
+
+def count_pin_dots(phone, png, unlock_y) -> int:
+    """Count the entered-digit dots shown above the keypad."""
+    from PIL import Image
+    im = Image.open(png).convert("L")
+    y = int(unlock_y - 890 * phone.h / 1440)
+    band = [max(im.getpixel((x, yy)) for yy in range(max(0, y - 14), min(im.height, y + 15)))
+            for x in range(im.width)]
+    # Dots are ~20 px wide, evenly spaced (~26 px) and centred on the
+    # screen. Emulator redraw glitches can leave dot-sized blocks elsewhere,
+    # so count the longest evenly spaced chain centred on the screen.
+    k = 1440 / phone.h
+    centres, width = [], 0
+    for x, v in enumerate(band + [0]):
+        if v > 200:
+            width += 1
+            continue
+        if 12 <= width * k <= 30:
+            centres.append(x - width / 2)
+        width = 0
+    best = 0
+    for i in range(len(centres)):
+        for j in range(i, len(centres)):
+            chain = centres[i:j + 1]
+            gaps = [b - a for a, b in zip(chain, chain[1:])]
+            if all(18 <= g * k <= 34 for g in gaps) and abs(sum(chain) / len(chain) - phone.w / 2) * k <= 8:
+                best = max(best, len(chain))
+    return best
+
+
 def _find_unlock(phone, shot, tries=3):
     """The PIN pad's "Unlock" button (case-sensitive: the clock page says
     "Slide up to unlock"), only while "Enter Passcode" is on screen."""
@@ -121,11 +154,21 @@ def unlock(phone, evidence, pin=PIN):
     # is tapped in one go on the measured
     # layout (no screenshots/OCR in between; the pad does not move while typing).
     keys = _keys(phone, button[1])
-    for d in pin:
-        phone.tap(*keys[d], hold=0.15)
-        time.sleep(1.0)
     after = evidence.shot_path("pin-typed")
-    phone.screenshot(after)
+    for attempt in range(3):
+        gap = 1.0 + 0.5 * attempt
+        for d in pin:
+            phone.tap(*keys[d], hold=0.15)
+            time.sleep(gap)
+        phone.screenshot(after)
+        # Under emulation Phosh can drop a tap; the dots show what it got.
+        dots = count_pin_dots(phone, after, button[1])
+        if dots == len(pin):
+            break
+        evidence.note(f"PIN pad showed {dots} of {len(pin)} digits; clearing and typing again")
+        for _ in range(dots + 1):
+            phone.tap(*_backspace(phone, button[1]), hold=0.15)
+            time.sleep(0.6)
     evidence.rec["shots"].append({"file": str(after.relative_to(after.parent.parent)), "label": "pin-typed"})
     phone.tap(*button, hold=0.15)
     # evidence: the keys we tapped really are those digits (OCR of each cell)

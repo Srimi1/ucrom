@@ -1,6 +1,6 @@
 # ucrom: status and hand-off
 
-Last updated 2026-09-26, 17:55 UTC. This file is the place to start if you
+Last updated 2026-09-26, 18:40 UTC. This file is the place to start if you
 pick the work up from a clone or a zip of this repository. It says what is
 done, what is proven and how, what is still open, and the exact commands to
 carry on.
@@ -86,16 +86,22 @@ The 27 failures, at that time:
 
 ## Open items, in order
 
-1. **Re-run the emulator suite and look at the failures.** A verification
-   run started at 17:38 UTC with all fixes, and it shows failures that
-   passed before: kernel inhibit check, compositor device list, unlock
-   (the PIN pad appears, but the phone does not unlock), calculator,
-   keyboard typing and the power button. The screenshots show the PIN pad
-   and quick settings correctly, so the emulator works. The first thing to
-   check is timing: whether the build machine was busy while it ran (see
-   "Lessons" below). Run it on an idle machine:
-   `sudo tools/dev/run-tests-paused.sh tests/test_20_touch_only.py tests/test_30_touch_ux.py`.
-   Then run the full report and commit `docs/test-report/`.
+1. **Re-run the emulator suite and commit a fresh report.** A verification
+   run at 17:38 UTC failed 12 tests. Findings, all fixed in the test harness
+   (the OS itself behaved correctly):
+   - The run started with the touch-only tests straight after boot. The
+     guest agent answers before udev has applied its rules, so the
+     keyboard/mouse were not inhibited *yet*. On a fully booted emulator
+     they are (checked by hand: keyboard and mouse `inhibited=1`, libinput
+     sees only the touchscreen and power keys). The emulator fixture now
+     waits for `systemctl is-system-running --wait` and `udevadm settle`.
+   - Unlock: Phosh sometimes drops PIN taps under emulation (libinput
+     receives every tap; the PIN pad shows fewer dots). The unlock helper
+     now counts the dots it sees and clears and retypes more slowly if
+     digits are missing. Checked by hand: unlocked twice in a row.
+   Most other failures followed from the phone staying locked. Run
+   `sudo tools/dev/run-tests-paused.sh report` on a quiet machine and
+   commit `docs/test-report/`.
 2. **Finish the bridge packages.** 5 of 27 build (see
    build-records/bridges/status.tsv): libglibutil, libgbinder,
    android-headers-30, libhybris, parse-android-dynparts. Fixes for the next
@@ -137,6 +143,11 @@ The 27 failures, at that time:
   contains the pattern (for example `pkill -f qemu-system` inside
   `bash -c "..."`) kills or finds itself. Write the pattern as
   `'[q]emu-system'`. The tests use `ui._self_safe()` for the same reason.
+- **A frozen (SIGSTOP) shell wakes up when anything sends it SIGCONT.** A
+  shell that had stopped itself at 13:20 was resumed hours later by a
+  "resume the builder" step whose pattern matched its command line, and it
+  started a stale `make report`. Check `ps -eo stat,pid,args | grep '^T'`
+  for leftovers before long runs.
 - **Do not edit a shell script while it runs.** Bash reads scripts as it
   goes; an edit in place corrupts the running copy. Write a new file and
   rename it over the old one, or wait for the run to end.

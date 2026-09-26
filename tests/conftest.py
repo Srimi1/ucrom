@@ -80,6 +80,10 @@ def phone():
     vm.start()
     try:
         vm.boot_seconds = vm.wait_for_agent(timeout=float(os.environ.get("UCROM_BOOT_TIMEOUT", "1500")))
+        # The guest agent answers before boot has finished. Wait for systemd
+        # and for udev to have applied every rule (the touch-only policy is a
+        # udev rule), so no test sees a half-booted phone.
+        vm.sh("timeout 900 systemctl is-system-running --wait; udevadm settle --timeout=300", timeout=1300)
         yield vm
     finally:
         vm.stop()
