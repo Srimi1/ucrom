@@ -79,6 +79,9 @@ if [ "$FLAVOR" = halium ]; then
         install -D -m 755 "$src/hooks/halium" "$MERGED/usr/share/initramfs-tools/hooks/halium"
         install -D -m 644 "$src/conf/halium" "$MERGED/usr/share/initramfs-tools/conf.d/halium"
     fi
+    # The hook copies the unversioned libcrypto.so dev symlink (only present
+    # with libssl-dev); use the runtime library instead.
+    sed -i -E 's#(libcrypto\.so)$#\1.3#' "$MERGED/usr/share/initramfs-tools/hooks/halium"
     # The Halium hook copies a touchscreen udev rule: ship ucrom's touch-only
     # policy in its place, so keyboards are blocked from the very first second.
     cp "$MERGED/etc/udev/rules.d/90-ucrom-touch-only.rules" "$MERGED/etc/udev/rules.d/90-touchscreen.rules"
@@ -90,7 +93,7 @@ fi
 # a build-time shim avoids pulling the whole dpkg-dev toolchain into the phone
 SHIM=""
 if ! chroot_run "$MERGED" sh -c 'command -v dpkg-architecture' >/dev/null 2>&1; then
-    SHIM="$MERGED/usr/local/bin/dpkg-architecture"
+    SHIM="$MERGED/usr/bin/dpkg-architecture"
     printf '#!/bin/sh\n# ucrom build-time shim\ncase "$*" in *MULTIARCH*) echo aarch64-linux-gnu ;; *ARCH*) echo arm64 ;; esac\n' > "$SHIM"
     chmod 755 "$SHIM"
 fi
@@ -116,7 +119,7 @@ for k in Image.gz Image; do [ -f "$KDIR/$k" ] && { KIMG="$KDIR/$k"; break; }; do
 DTB="$STAGE/dtb"
 if [ "$FLAVOR" = halium ]; then
     # All base DTBs for the SoC; the bootloader picks by msm-id/board-id
-    find "$KDIR/dtbs" -name '*.dtb' -path '*qcom*' | sort | xargs cat > "$DTB"
+    find "$KDIR/dtbs" -name '*.dtb' | sort | xargs cat > "$DTB"
 else
     cp "$KDIR/dtbs/$DEVICE_MAINLINE_DTB.dtb" "$DTB" || die "missing DTB $DEVICE_MAINLINE_DTB"
 fi
