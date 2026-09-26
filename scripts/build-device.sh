@@ -179,13 +179,18 @@ else
     mkfs.ext4 -q -F -L userdata -d "$MERGED" "$raw"
 fi
 umount "$MERGED"
+# Disk-frugal: hash the raw image, keep only the sparse one, then prove the
+# sparse image expands back to the identical filesystem.
+raw_sha=$(sha256sum "$raw" | cut -d' ' -f1)
 img2simg "$raw" "$DEST/userdata.img"
+rm -f "$raw"
+rm -rf "$STAGE/upper" "$STAGE/work"
 
 # --- validation (recorded; tests read it for images not kept on disk)
 {
     echo "userdata_sparse_bytes=$(stat -c %s "$DEST/userdata.img")"
     simg2img "$DEST/userdata.img" "$STAGE/check.raw"
-    if cmp -s "$raw" "$STAGE/check.raw"; then echo "sparse_roundtrip=ok"; else echo "sparse_roundtrip=FAIL"; fi
+    if [ "$(sha256sum "$STAGE/check.raw" | cut -d' ' -f1)" = "$raw_sha" ]; then echo "sparse_roundtrip=ok"; else echo "sparse_roundtrip=FAIL"; fi
     if e2fsck -fn "$STAGE/check.raw" >/dev/null 2>&1; then echo "e2fsck=ok"; else echo "e2fsck=FAIL"; fi
     if [ "$FLAVOR" = halium ]; then
         cat "$STAGE/halium-system"
@@ -194,7 +199,7 @@ img2simg "$raw" "$DEST/userdata.img"
         debugfs -R "cat /etc/os-release" "$STAGE/check.raw" 2>/dev/null | grep -q '^ID=ucrom' && echo "rootfs_os_release=ok" || echo "rootfs_os_release=FAIL"
     fi
 } > "$DEST/VALIDATION"
-rm -f "$raw" "$STAGE/check.raw"
+rm -f "$STAGE/check.raw"
 cat "$DEST/VALIDATION"
 
 (cd "$DEST" && sha256sum ./*.img > SHA256SUMS)
