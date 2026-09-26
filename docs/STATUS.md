@@ -1,6 +1,6 @@
 # ucrom: status and hand-off
 
-Last updated 2026-09-26, 18:40 UTC. This file is the place to start if you
+Last updated 2026-09-26, 19:40 UTC. This file is the place to start if you
 pick the work up from a clone or a zip of this repository. It says what is
 done, what is proven and how, what is still open, and the exact commands to
 carry on.
@@ -99,6 +99,13 @@ The 27 failures, at that time:
      receives every tap; the PIN pad shows fewer dots). The unlock helper
      now counts the dots it sees and clears and retypes more slowly if
      digits are missing. Checked by hand: unlocked twice in a row.
+   - The full run at 18:31 still failed unlock, and every touch test after
+     it. Cause (proven on the emulator): the USB hot-plug test leaves a USB
+     mouse attached, and QEMU then routes the injected touch button events
+     to that mouse, so no tap or swipe reaches the touchscreen. Unlock
+     failed with the USB mouse plugged in and worked right after unplugging
+     it. The hot-plug test now unplugs its devices when it ends. This is a
+     QEMU input-injection quirk; a real phone is not affected.
    Most other failures followed from the phone staying locked. Run
    `sudo tools/dev/run-tests-paused.sh report` on a quiet machine and
    commit `docs/test-report/`.

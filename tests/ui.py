@@ -157,6 +157,17 @@ def unlock(phone, evidence, pin=PIN):
     after = evidence.shot_path("pin-typed")
     for attempt in range(3):
         gap = 1.0 + 0.5 * attempt
+        if attempt:
+            # the PIN page falls back to the clock after a few idle seconds
+            button = _find_unlock(phone, pad, tries=1)
+            if not button:
+                wake(phone)
+                swipe_up_from_bottom(phone)
+                time.sleep(3)
+                button = _find_unlock(phone, pad, tries=2)
+            if not button:
+                continue
+            keys = _keys(phone, button[1])
         for d in pin:
             phone.tap(*keys[d], hold=0.15)
             time.sleep(gap)

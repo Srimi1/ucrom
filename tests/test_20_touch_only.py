@@ -126,6 +126,13 @@ def test_mouse_does_nothing(phone, evidence):
 
 def test_usb_keyboard_and_mouse_hotplug_blocked(phone, evidence):
     """Plugging in a USB keyboard and mouse: no driver ever binds"""
+    try:
+        _usb_hotplug_checks(phone, evidence)
+    finally:
+        phone.unplug_usb()
+
+
+def _usb_hotplug_checks(phone, evidence):
     before = set(inputs(phone))
     phone.hotplug_usb("usb-kbd")
     phone.hotplug_usb("usb-mouse")
