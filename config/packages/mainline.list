@@ -1,0 +1,3 @@
+# Hardware flavor: mainline kernel devices and the QEMU test image
+pipewire-audio
+wireplumber

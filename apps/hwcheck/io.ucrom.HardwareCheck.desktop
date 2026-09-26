@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Hardware Check
+Comment=Test every part of the phone
+Exec=/usr/bin/ucrom-hwcheck
+Icon=utilities-system-monitor
+Categories=System;Settings;
+StartupNotify=true
+X-Purism-FormFactor=Workstation;Mobile;

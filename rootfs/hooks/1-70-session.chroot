@@ -1,0 +1,5 @@
+# Boot straight into the touch shell as the phone user
+systemctl set-default graphical.target
+systemctl enable phosh.service
+# The first thing on screen is the Phosh lock screen (PIN pad / fingerprint)
+mkdir -p /etc/phosh

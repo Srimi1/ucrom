@@ -1,0 +1,12 @@
+[Unit]
+Description=ucrom in-display fingerprint (sensor light + lock screen unlock)
+ConditionPathExists=/sys/kernel/oplus_display
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/ucrom-fod
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

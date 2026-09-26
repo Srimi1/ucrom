@@ -1,0 +1,12 @@
+[Unit]
+Description=ucrom touch-only input guard (re-apply input policy to all devices)
+After=systemd-udev-trigger.service systemd-udevd.service
+Before=display-manager.service phosh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/ucrom/bin/ucrom-input-guard
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

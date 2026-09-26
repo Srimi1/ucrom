@@ -1,0 +1,12 @@
+[Unit]
+Description=ucrom alert slider (ring / vibrate / silent)
+ConditionPathExists=/proc/tristatekey/tri_state
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/ucrom-alertslider
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

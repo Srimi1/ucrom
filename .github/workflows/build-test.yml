@@ -1,0 +1,50 @@
+name: ucrom checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Build the OS and run the emulator test suite (hours)"
+        type: boolean
+        default: false
+
+jobs:
+  quick:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y shellcheck python3-pytest device-tree-compiler udev
+      - name: Shell scripts
+        run: shellcheck -S error scripts/*.sh apps/installers/*.sh rootfs/overlay/usr/lib/ucrom/bin/*
+      - name: Python
+        run: python3 -m py_compile apps/apphub/apphub.py apps/hwcheck/*.py ucrom/ucromhw/*.py scripts/tools/*.py tests/*.py
+      - name: udev rule
+        run: udevadm verify --no-style rootfs/overlay/etc/udev/rules.d/90-ucrom-touch-only.rules
+      - name: Phone and chip profiles against upstream kernel trees
+        run: scripts/validate-socs.sh
+      - name: Tests that need no build
+        run: UCROM_SKIP_VM=1 python3 -m pytest -v tests/test_63_soc_matrix.py tests/test_50_daemons.py::test_dumpsys_parser
+
+  full:
+    if: github.event_name == 'workflow_dispatch' && inputs.full
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-arm qemu-user-static qemu-utils mmdebstrap mkbootimg \
+            android-sdk-libsparse-utils device-tree-compiler gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi \
+            clang lld bc flex bison libssl-dev cpio kmod e2fsprogs tesseract-ocr python3-pytest python3-pil rsync zstd
+      - name: Build OS + emulator image
+        run: sudo make rootfs-mainline qemu-image
+      - name: Test and report
+        run: sudo make report
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: docs/test-report

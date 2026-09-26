@@ -1,0 +1,60 @@
+# ucrom App Hub catalog. Every app installs from its official source into the
+# phone user's home (no root needed) and gets a home-screen launcher.
+#
+#   kind: terminal  -> launcher opens ucrom's touch terminal in ~/Projects
+#   kind: gui       -> launcher starts the app directly
+apps:
+  - id: claude-code
+    name: Claude Code
+    summary: Anthropic's AI coding agent for the terminal
+    icon: utilities-terminal-symbolic
+    kind: terminal
+    command: claude
+    check: claude --version
+    installer: claude-code.sh
+    source: npm @anthropic-ai/claude-code (official, linux-arm64 build)
+  - id: codex
+    name: Codex CLI
+    summary: OpenAI's coding agent for the terminal
+    icon: utilities-terminal-symbolic
+    kind: terminal
+    command: codex
+    check: codex --version
+    installer: codex.sh
+    source: npm @openai/codex (official, linux-arm64 build)
+  - id: gemini-cli
+    name: Gemini CLI
+    summary: Google's AI agent for the terminal
+    icon: utilities-terminal-symbolic
+    kind: terminal
+    command: gemini
+    check: gemini --version
+    installer: gemini-cli.sh
+    source: npm @google/gemini-cli (official)
+  - id: antigravity
+    name: Antigravity
+    summary: Google's agentic IDE (VS Code based)
+    icon: applications-engineering-symbolic
+    kind: gui
+    command: antigravity
+    check: test -x ~/.local/share/ucrom-apps/antigravity/antigravity
+    installer: antigravity.sh
+    source: official download from antigravity.google (Linux ARM64 build)
+  - id: vscode
+    name: Visual Studio Code
+    summary: Code editor with extensions and AI assistants
+    icon: accessories-text-editor-symbolic
+    kind: gui
+    command: code
+    check: test -x ~/.local/share/ucrom-apps/vscode/usr/share/code/code
+    installer: vscode.sh
+    source: packages.microsoft.com (official arm64 .deb, checksum verified)
+  - id: llm
+    name: LLM
+    summary: Command-line access to many AI models (Python)
+    icon: utilities-terminal-symbolic
+    kind: terminal
+    command: llm
+    check: llm --version
+    installer: llm.sh
+    source: PyPI via pipx

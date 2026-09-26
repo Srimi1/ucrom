@@ -1,0 +1,16 @@
+# Touch shell
+phosh
+phoc
+phosh-osk-stub
+phosh-mobile-settings
+phosh-plugins
+gnome-control-center
+gnome-settings-daemon
+xdg-desktop-portal-gtk
+xdg-desktop-portal-gnome
+fonts-noto-core
+fonts-noto-color-emoji
+adwaita-icon-theme
+gir1.2-adw-1
+gir1.2-gtk-4.0
+wlr-randr

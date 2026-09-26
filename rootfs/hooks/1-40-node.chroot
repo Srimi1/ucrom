@@ -1,0 +1,12 @@
+# Node.js 22 LTS for AI CLI agents (Claude Code requires Node >= 22)
+. /tmp/ucrom-hooks/ucrom.conf
+want="v$UCROM_NODE_VERSION"
+if [ "$(/opt/node/bin/node --version 2>/dev/null)" != "$want" ]; then
+    tarball="node-$want-linux-arm64.tar.xz"
+    curl -fsSL --retry 5 -o "/tmp/$tarball" "https://nodejs.org/dist/$want/$tarball"
+    echo "$UCROM_NODE_SHA256  /tmp/$tarball" | sha256sum -c -
+    rm -rf /opt/node && mkdir -p /opt/node
+    tar -C /opt/node --strip-components=1 -xJf "/tmp/$tarball"
+    rm -f "/tmp/$tarball"
+fi
+/opt/node/bin/node --version

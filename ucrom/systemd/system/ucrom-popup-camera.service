@@ -1,0 +1,13 @@
+[Unit]
+Description=ucrom pop-up camera motor
+ConditionPathExists=/sys/class/motor/enable
+
+[Service]
+ExecStart=/usr/bin/ucrom-popup-camera
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=ucrom
+RuntimeDirectoryPreserve=yes
+
+[Install]
+WantedBy=multi-user.target

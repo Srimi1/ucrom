@@ -1,0 +1,17 @@
+# ucrom's own hardware helpers (Python package ucromhw)
+for tool in alertslider:alertslider popup-camera:popupcamera fod:fod refresh-rate:refreshrate; do
+    name=${tool%%:*}; mod=${tool##*:}
+    cat > "/usr/bin/ucrom-$name" <<EOT
+#!/bin/sh
+export PYTHONPATH=/usr/lib/ucrom/daemons\${PYTHONPATH:+:\$PYTHONPATH}
+exec /usr/bin/python3 -m ucromhw.$mod "\$@"
+EOT
+    chmod 755 "/usr/bin/ucrom-$name"
+done
+install -m 644 /usr/lib/ucrom/daemons/systemd/user/*.service /usr/lib/systemd/user/
+install -m 644 /usr/lib/ucrom/daemons/systemd/system/*.service /usr/lib/systemd/system/
+systemctl --global enable ucrom-alertslider.service ucrom-fod.service ucrom-refresh-rate.service
+systemctl enable ucrom-popup-camera.service
+# /run/ucrom is where apps flag "front camera in use" for the pop-up camera
+echo 'd /run/ucrom 1777 root root -' > /usr/lib/tmpfiles.d/ucrom.conf
+python3 -c "import sys; sys.path.insert(0, '/usr/lib/ucrom/daemons'); import ucromhw.alertslider, ucromhw.popupcamera, ucromhw.refreshrate"

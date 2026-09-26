@@ -1,0 +1,11 @@
+# Remove every keyboard-driven path into the system
+for unit in getty@.service serial-getty@.service getty.target console-getty.service \
+            container-getty@.service autovt@.service debug-shell.service; do
+    systemctl mask "$unit" >/dev/null 2>&1 || true
+done
+# No remote shell either
+apt-get purge -y openssh-server >/dev/null 2>&1 || true
+systemctl enable ucrom-input-guard.service
+dconf update
+# udev rules must parse
+udevadm verify /etc/udev/rules.d/90-ucrom-touch-only.rules 2>/dev/null || true
