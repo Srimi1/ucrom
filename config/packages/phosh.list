@@ -26,3 +26,6 @@ gvfs-backends
 gvfs-fuse
 xdg-desktop-portal-wlr
 phosh-mobile-tweaks
+# SVG icons (Adwaita symbolic/app icons) and the accessibility bus the OSK uses
+librsvg2-common
+at-spi2-core

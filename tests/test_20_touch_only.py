@@ -133,7 +133,7 @@ def test_touch_is_delivered(phone, evidence):
     """Touches on the screen do reach the system"""
     _read_events(phone, "ultitouch", 5)
     time.sleep(1)
-    phone.tap(270, 585)
+    phone.tap(phone.w / 2, phone.h / 2)
     time.sleep(5)
     n = int(phone.sh("cat /tmp/ucrom-evcount-ultitouch").out.strip() or 0)
     evidence.note(f"touch events delivered for one tap: {n}")

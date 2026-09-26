@@ -13,7 +13,6 @@ from pathlib import Path
 import pytest
 
 import ui
-from vm import SCREEN_W
 
 pytestmark = pytest.mark.vm
 
@@ -48,14 +47,14 @@ def install_and_open(phone, evidence, app_label, app_id, process, timeout=1500):
     for _ in range(4):
         if row:
             break
-        phone.swipe(SCREEN_W / 2, 900, SCREEN_W / 2, 400, duration=0.5)
+        phone.swipe(phone.w / 2, 900, phone.w / 2, 400, duration=0.5)
         time.sleep(2)
         phone.screenshot(shot)
         row = phone.find_text(shot, app_label)
     assert row, f"{app_label} not listed in App Hub"
     btn = phone.find_text(shot, "Install")
     # buttons are right-aligned; tap the button column on the app's row
-    x_btn = btn[0] if btn else SCREEN_W - 60
+    x_btn = btn[0] if btn else phone.w - 60
     phone.tap(x_btn, row[1])
     evidence.screenshot(phone, f"installing-{app_id}")
     log = "/home/ucrom/.local/state/ucrom/apphub.log"

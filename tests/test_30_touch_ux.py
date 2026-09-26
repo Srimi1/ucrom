@@ -5,7 +5,6 @@ import time
 import pytest
 
 import ui
-from vm import SCREEN_H, SCREEN_W
 
 pytestmark = pytest.mark.vm
 
@@ -14,9 +13,8 @@ def test_unlock_with_pin_pad(phone, evidence):
     """Swipe up, tap the PIN on the pad, phone unlocks"""
     ui.wait_shell_ready(phone)
     if not ui.is_locked(phone):
-        phone.sh("gdbus call --session -d org.gnome.ScreenSaver -o /org/gnome/ScreenSaver "
-                 "-m org.gnome.ScreenSaver.SetActive true", user=True)
-        time.sleep(4)
+        ui.lock(phone)
+        time.sleep(6)
     assert ui.is_locked(phone)
     ui.unlock(phone, evidence)
     evidence.screenshot(phone, "home")
@@ -44,7 +42,7 @@ def test_calculator_by_touch(phone, evidence):
 def test_on_screen_keyboard_typing(phone, evidence):
     """Type text using only on-screen keyboard taps"""
     ui.open_app(phone, evidence, "Text Editor", "gnome-text-editor")
-    phone.tap(SCREEN_W / 2, SCREEN_H * 0.35)   # focus the document
+    phone.tap(phone.w / 2, phone.h * 0.35)   # focus the document
     time.sleep(4)
     kb = evidence.screenshot(phone, "osk-shown")
     osk = phone.sh("pgrep -f phosh-osk-stub >/dev/null && echo yes").out.strip()
@@ -64,13 +62,13 @@ def test_on_screen_keyboard_typing(phone, evidence):
 
 def test_quick_settings_swipe(phone, evidence):
     """Swipe down from the top opens quick settings"""
-    phone.swipe(SCREEN_W / 2, 3, SCREEN_W / 2, SCREEN_H * 0.6, duration=0.4)
+    phone.swipe(phone.w / 2, 3, phone.w / 2, phone.h * 0.6, duration=0.4)
     time.sleep(3)
     shot = evidence.screenshot(phone, "quick-settings")
     text = phone.ocr(shot)
     evidence.note("quick settings text: " + " ".join(text.split())[:200])
     assert any(w in text for w in ("Wi-Fi", "WiFi", "Bluetooth", "Battery", "Airplane", "Torch", "Rotation"))
-    phone.swipe(SCREEN_W / 2, SCREEN_H * 0.6, SCREEN_W / 2, 3, duration=0.4)
+    phone.swipe(phone.w / 2, phone.h * 0.6, phone.w / 2, 3, duration=0.4)
     time.sleep(2)
 
 
@@ -78,8 +76,9 @@ def test_power_button_locks(phone, evidence):
     """The phone's power button blanks and locks the screen (never shuts down)"""
     assert not ui.is_locked(phone)
     phone.power_button()
-    phone.wait_until(ui.SS + " | grep -q true", timeout=30, interval=1, user=True)
-    time.sleep(2)
+    deadline = time.time() + 60
+    while not ui.is_locked(phone) and time.time() < deadline:
+        time.sleep(3)
     evidence.screenshot(phone, "after-power-button")
     assert phone.sh("systemctl is-system-running").out.strip() in ("running", "degraded")
     evidence.note("locked, system still running")
