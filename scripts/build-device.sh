@@ -135,7 +135,8 @@ else
     cat "$KIMG" "$DTB" > "$STAGE/kernel-dtb"
     MKARGS[1]="$STAGE/kernel-dtb"
 fi
-mkbootimg "${MKARGS[@]}" -o "$DEST/boot.img"
+# Ubuntu's mkbootimg imports a gki module it does not ship
+PYTHONPATH="$UCROM_ROOT/scripts/tools/pyshim" mkbootimg "${MKARGS[@]}" -o "$DEST/boot.img"
 size=$(stat -c %s "$DEST/boot.img")
 if [ -n "${DEVICE_BOOT_PARTITION_SIZE:-}" ] && [ "$size" -gt "$DEVICE_BOOT_PARTITION_SIZE" ]; then
     die "boot.img ($size) larger than boot partition ($DEVICE_BOOT_PARTITION_SIZE)"
