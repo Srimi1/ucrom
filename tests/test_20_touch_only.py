@@ -77,13 +77,17 @@ PY
 
 def test_hardware_keyboard_typing_does_nothing(phone, evidence):
     """Typing on the keyboard delivers zero events and changes nothing on screen"""
+    # compare the lit lock screen, not a blanked panel: no idle blanking
+    # during the test (test-only setting) and the panel really on
+    phone.sh("gsettings set org.gnome.desktop.session idle-delay 0", user=True)
+    assert ui.ensure_lit(phone), "could not wake the screen by touch"
     # the lock screen shows a big clock: start just after a minute turns over
     # so the only thing that could change the screen is the keyboard
-    ui.wake(phone)   # compare the lit lock screen, not a blanked panel
     while int(phone.sh("date +%S").out.strip() or 0) > 15:
         time.sleep(2)
     _read_events(phone, "Keyboard", 20)
     time.sleep(1)
+    assert ui.ensure_lit(phone)
     before = evidence.screenshot(phone, "before-typing")
     phone.type_on_hardware_keyboard("hello ucrom\n")
     phone.type_on_hardware_keyboard("rm -rf /\n")

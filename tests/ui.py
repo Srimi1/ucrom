@@ -55,6 +55,22 @@ def wake(phone):
         time.sleep(4)
 
 
+def ensure_lit(phone, tries=5) -> bool:
+    """Wake the panel by touch and wait until it really shows something
+    (under emulation the panel can take several seconds to come back)."""
+    import tempfile
+    from pathlib import Path
+    from PIL import Image, ImageStat
+    shot = Path(tempfile.mkdtemp()) / "lit.png"
+    for _ in range(tries):
+        phone.screenshot(shot)
+        if ImageStat.Stat(Image.open(shot).convert("L")).mean[0] >= 3:
+            return True
+        phone.tap(phone.w / 2, phone.h / 2, hold=0.15)
+        time.sleep(6)
+    return False
+
+
 def swipe_up_from_bottom(phone):
     phone.swipe(phone.w / 2, phone.h * 0.90, phone.w / 2, phone.h * 0.30, duration=0.8, steps=20)
 
