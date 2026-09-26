@@ -101,7 +101,7 @@ def test_popup_camera(phone, evidence):
     log = phone.sh("cat /tmp/popup.log; tail -3 /tmp/motor-moves.log").out
     evidence.note(f"free fall at {t0}; helper log:\n" + log.strip())
     assert "free fall" in log
-    phone.sh("pkill -f ucromhw.popupcamera; pkill -f motor-sim.sh; true")
+    phone.sh("pkill -f '[u]cromhw.popupcamera'; pkill -f '[m]otor-sim.sh'; true")
 
 
 def test_dumpsys_parser():
@@ -184,7 +184,7 @@ def test_fingerprint_unlock_and_sensor_light(phone, evidence):
     assert "right-thumb" in log
     assert "sensor light on" in log and "sensor light off" in log
     assert log.strip().endswith("0"), "sensor light is off again after the scan"
-    phone.sh("pkill -f ucromhw.fod; pkill -f fake-fpd.py; rm -f /etc/dbus-1/system.d/ucrom-test-fpd.conf; true")
+    phone.sh("pkill -f '[u]cromhw.fod'; pkill -f '[f]ake-fpd.py'; rm -f /etc/dbus-1/system.d/ucrom-test-fpd.conf; true")
 
 
 def test_refresh_rate_helper(phone, evidence):

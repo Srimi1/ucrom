@@ -120,10 +120,22 @@ def unlock(phone, evidence, pin=PIN):
     raise VMError("still locked after entering the PIN")
 
 
-def open_overview(phone):
-    """Swipe up from the bottom edge: Phosh's overview (running apps + app grid)."""
-    phone.swipe(phone.w / 2, phone.h - 5, phone.w / 2, phone.h * 0.62, duration=0.6, steps=15)
-    time.sleep(4)
+def open_overview(phone, tries=3):
+    """Swipe up from the bottom edge: Phosh's overview (running apps + app
+    grid). Returns the position of its search field, or None. Retried: with
+    the on-screen keyboard up, the first edge swipe can land on the keyboard."""
+    import tempfile
+    from pathlib import Path
+    shot = Path(tempfile.mkdtemp()) / "overview.png"
+    for _ in range(tries):
+        phone.swipe(phone.w / 2, phone.h - 3, phone.w / 2, phone.h * 0.55, duration=0.6, steps=15)
+        time.sleep(4)
+        phone.screenshot(shot)
+        # the field's grey placeholder text OCRs with low confidence
+        pos = phone.find_text(shot, r"Search( apps\.*)?", min_conf=15)
+        if pos:
+            return pos
+    return None
 
 
 def _k(phone):
@@ -139,59 +151,85 @@ def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300)
     i = order.index(desktop_id)
     shot = evidence.shot_path("app-grid")
     search = None
-    for _ in range(3):
-        open_overview(phone)
+    for _ in range(8):
+        search = open_overview(phone)
         phone.screenshot(shot)
-        search = phone.find_text(shot, "Search apps...|Search apps|Search")
-        if search:
+        if search and search[1] < phone.h * 0.2:
             break
-    if not search:
-        raise VMError("app grid not found")
+        if search:
+            # running apps' cards push the grid down and fold the favourites
+            # away: swipe the cards off first, like a user clearing recents
+            phone.swipe(phone.w / 2, phone.h * 0.26, phone.w / 2, 10, duration=0.4, steps=12)
+            time.sleep(3)
+    if not search or search[1] >= phone.h * 0.2:
+        raise VMError(f"app grid not found (search field at {search})")
     evidence.rec["shots"].append({"file": str(shot.relative_to(shot.parent.parent)), "label": "app-grid"})
     x = phone.w * (0.125 + 0.25 * (i % 4))
     y = search[1] + (131 if i < 4 else 284) * _k(phone)
     phone.tap(x, y, hold=0.12)
-    phone.wait_until(f"pgrep -f '{process}' >/dev/null", timeout=timeout, interval=3)
+    phone.wait_until(f"pgrep -f '{_self_safe(process)}' >/dev/null", timeout=timeout, interval=3)
     wait_for_text(phone, evidence, ready_text, timeout=timeout)
 
 
-def wait_for_text(phone, evidence, pattern, timeout=300, label="screen"):
+def wait_for_text(phone, evidence, pattern, timeout=300, label="screen", threshold=0):
     """Wait until OCR finds `pattern` on screen (apps render slowly under TCG)."""
     import re
     shot = evidence.shot_path(label)
     deadline = time.time() + timeout
     while time.time() < deadline:
         phone.screenshot(shot)
-        if re.search(pattern, phone.ocr(shot)):
+        if re.search(pattern, phone.ocr(shot, threshold=threshold)):
             return shot
         time.sleep(5)
     raise VMError(f"/{pattern}/ not on screen after {timeout}s")
 
 
-def close_app(phone, process, timeout=40):
-    """Open the overview and swipe the app's card up and away."""
-    open_overview(phone)
+def _self_safe(process):
+    """'kgx' -> '[k]gx': the regex still matches the app, but no longer the
+    guest shell running pgrep (whose own command line contains the name)."""
+    return f"[{process[0]}]{process[1:]}"
+
+
+def close_app(phone, process, timeout=90, gone=None):
+    """Open the overview and swipe the app's card up and away. `gone` is a
+    guest shell test for "the window is closed" (default: no such process;
+    Console keeps a background service, so its test is "no shell left")."""
+    gone = gone or f"! pgrep -f '{_self_safe(process)}' >/dev/null"
+    if not open_overview(phone):
+        return False
     phone.swipe(phone.w / 2, phone.h * 0.26, phone.w / 2, 10, duration=0.4, steps=12)
     deadline = time.time() + timeout
     while time.time() < deadline:
-        if not phone.sh(f"pgrep -f '{process}' >/dev/null").ok:
+        if phone.sh(gone).ok:
             return True
         time.sleep(2)
     return False
 
 
+# Console's window is closed when kgx has no shell child left (kgx itself may
+# linger a while as a background service)
+KGX_CLOSED = "k=$(pgrep -d, -x kgx) || exit 0; ! pgrep -P \"$k\" >/dev/null"
+
+
 # GNOME Calculator (46) basic keypad, anchored on its "mod" button
-CALC_KEYS = {"7": (-411, 89), "8": (-273, 89), "9": (-136, 89), "x": (0, 180),
+CALC_KEYS = {"C": (-411, 0), "7": (-411, 89), "8": (-273, 89), "9": (-136, 89), "x": (0, 180),
              "4": (-411, 180), "5": (-273, 180), "6": (-136, 180), "=": (136, 315),
              "1": (-411, 270), "2": (-273, 270), "3": (-136, 270), "0": (-411, 360),
              "+": (0, 360), "-": (0, 270)}
 
-# phosh-osk-stub English (US) letter layer, anchored on the space bar label
-OSK_ROWS = {"qwertyuiop": (-298, 0.05), "asdfghjkl": (-199, 0.10), "zxcvbnm": (-98, 0.20)}
+# phosh-osk-stub letter layers, anchored on the space bar label: row offset
+# above the space bar (1440-px units), first key x and key pitch (fractions
+# of the width). Terminals get the "Terminal" layout (extra ~, Tab, ESC keys).
+OSK_LAYOUTS = {
+    "English": {"qwertyuiop": (-298, 0.05, 0.10), "asdfghjkl": (-199, 0.10, 0.10),
+                "zxcvbnm": (-98, 0.20, 0.10)},
+    "Terminal": {"qwertyuiop": (-300, 0.133, 0.091), "asdfghjkl": (-200, 0.133, 0.091),
+                 "zxcvbnm": (-100, 0.225, 0.091)},
+}
 
 
-def osk_key(phone, space, ch):
-    for row, (dy, x0) in OSK_ROWS.items():
+def osk_key(phone, space, ch, layout="English"):
+    for row, (dy, x0, pitch) in OSK_LAYOUTS[layout].items():
         if ch in row:
-            return (phone.w * (x0 + 0.10 * row.index(ch)), space[1] + dy * _k(phone))
+            return (phone.w * (x0 + pitch * row.index(ch)), space[1] + dy * _k(phone))
     raise KeyError(ch)

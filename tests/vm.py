@@ -315,40 +315,44 @@ class PhoneVM:
         return path
 
     @staticmethod
-    def _prep(png: Path, out: Path, scale: int = 1, box=None) -> None:
+    def _prep(png: Path, out: Path, scale: int = 1, box=None, threshold: int = 0) -> None:
         """Grayscale, crop, invert dark screens (tesseract wants dark text
-        on light), optionally upscale."""
+        on light), optionally upscale. `threshold` keeps only near-white
+        text (as black on white): for light labels on grey keys."""
         from PIL import Image, ImageOps, ImageStat
         im = Image.open(png).convert("L")
         if box:
             im = im.crop(box)
-        if ImageStat.Stat(im).mean[0] < 128:
+        if threshold:
+            im = im.point(lambda v: 0 if v > threshold else 255)
+        elif ImageStat.Stat(im).mean[0] < 128:
             im = ImageOps.invert(im)
         if scale != 1:
             im = im.resize((im.width * scale, im.height * scale))
         im.save(out)
 
-    def ocr(self, png: Path, psm: int = 11, box=None, scale: int = 1) -> str:
+    def ocr(self, png: Path, psm: int = 11, box=None, scale: int = 1, threshold: int = 0) -> str:
         """Read text on screen with tesseract."""
         prep = png.with_suffix(".ocr.png")
-        self._prep(png, prep, scale, box)
+        self._prep(png, prep, scale, box, threshold)
         r = subprocess.run(["tesseract", str(prep), "-", "--psm", str(psm)],
                            capture_output=True, text=True, check=False)
         prep.unlink(missing_ok=True)
         return r.stdout
 
-    def find_text(self, png: Path, pattern: str, scale: int = 1, case: bool = False):
+    def find_text(self, png: Path, pattern: str, scale: int = 1, case: bool = False, min_conf: float = 30,
+                  threshold: int = 0):
         """Locate text on screen (tesseract TSV). Returns (x, y) centre in
         screen pixels of the first word/phrase matching the regex, or None."""
         import csv
         import re
         prep = png.with_suffix(".find.png")
-        self._prep(png, prep, scale)
+        self._prep(png, prep, scale, threshold=threshold)
         r = subprocess.run(["tesseract", str(prep), "-", "--psm", "11", "tsv"],
                            capture_output=True, text=True, check=False)
         prep.unlink(missing_ok=True)
         rows = list(csv.DictReader(r.stdout.splitlines(), delimiter="\t", quoting=csv.QUOTE_NONE))
-        words = [w for w in rows if w.get("text", "").strip() and float(w.get("conf", -1)) > 30]
+        words = [w for w in rows if w.get("text", "").strip() and float(w.get("conf", -1)) > min_conf]
         rx = re.compile(pattern, 0 if case else re.I)
         # single words first, then adjacent pairs on the same line
         for w in words:
@@ -362,10 +366,10 @@ class PhoneVM:
                     return ((x1 + x2) / 2 / scale, (y1 + y2) / 2 / scale)
         return None
 
-    def read_char(self, png: Path, x: float, y: float, half: int = 45) -> str:
+    def read_char(self, png: Path, x: float, y: float, half: int = 45, threshold: int = 0) -> str:
         """OCR the single character around (x, y) (e.g. a keypad key)."""
         box = (int(x - half), int(y - half), int(x + half), int(y + half))
-        return self.ocr(png, psm=10, box=box, scale=2).strip()
+        return self.ocr(png, psm=10, box=box, scale=2, threshold=threshold).strip()
 
     @staticmethod
     def _centre(w, scale):
@@ -471,7 +475,7 @@ class PhoneVM:
     def type_on_hardware_keyboard(self, text: str) -> None:
         events = []
         for ch in text:
-            code = {" ": "spc", "\n": "ret"}.get(ch, ch.lower())
+            code = {" ": "spc", "\n": "ret", "-": "minus", "/": "slash", ".": "dot"}.get(ch, ch.lower())
             for down in (True, False):
                 events.append({"type": "key", "data": {"down": down, "key": {"type": "qcode", "data": code}}})
         self._send(events)

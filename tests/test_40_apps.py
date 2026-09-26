@@ -39,6 +39,10 @@ def online(phone):
     return env
 
 
+def open_hub(phone, evidence):
+    ui.open_favorite(phone, evidence, "io.ucrom.AppHub.desktop", "apphub.py", r"App Hub|Install|Claude")
+
+
 def install_and_open(phone, evidence, app_label, app_id, process, timeout=1500):
     """Tap Install on the App Hub row, wait, then tap Open."""
     shot = evidence.shot_path(f"hub-{app_id}")
@@ -67,7 +71,7 @@ def install_and_open(phone, evidence, app_label, app_id, process, timeout=1500):
     phone.screenshot(shot)
     opened = phone.find_text(shot, "Open")
     phone.tap(opened[0] if opened else x_btn, row[1])
-    phone.wait_until(f"pgrep -f '{process}' >/dev/null", timeout=300, interval=3)
+    phone.wait_until(f"pgrep -f '{ui._self_safe(process)}' >/dev/null", timeout=300, interval=3)
     time.sleep(15)
     evidence.screenshot(phone, f"running-{app_id}")
 
@@ -76,7 +80,7 @@ def test_app_hub_opens(phone, online, evidence):
     """App Hub opens from the app grid by touch"""
     if ui.is_locked(phone):
         ui.unlock(phone, evidence)
-    ui.open_app(phone, evidence, "App Hub", "ucrom-apphub|apphub.py")
+    open_hub(phone, evidence)
     evidence.screenshot(phone, "app-hub")
 
 
@@ -86,28 +90,28 @@ def test_app_hub_opens(phone, online, evidence):
 ])
 def test_ai_agent(phone, online, evidence, label, app_id, process, version_cmd):
     """AI coding agent installs from its official source and starts in the touch terminal"""
-    if not phone.sh("pgrep -f apphub.py >/dev/null").ok:
-        ui.open_app(phone, evidence, "App Hub", "apphub.py")
+    if not phone.sh("pgrep -f '[a]pphub.py' >/dev/null").ok:
+        open_hub(phone, evidence)
     install_and_open(phone, evidence, label, app_id, process)
     v = phone.sh(version_cmd, user=True)
     evidence.note(f"{version_cmd}: {v.out.strip() or v.err.strip()}")
     assert v.ok
     arch = phone.sh(f"file -L $(readlink -f $(runuser -u ucrom -- bash -lc 'command -v {process}')) || true").out
     evidence.note(arch.strip()[:200])
-    phone.sh("pkill -f kgx; true")
+    phone.sh("pkill -x kgx; true")
     time.sleep(3)
 
 
 def test_vscode(phone, online, evidence):
     """VS Code (same Electron/VS Code base as Antigravity) installs and runs, scaled to the phone"""
-    if not phone.sh("pgrep -f apphub.py >/dev/null").ok:
-        ui.open_app(phone, evidence, "App Hub", "apphub.py")
+    if not phone.sh("pgrep -f '[a]pphub.py' >/dev/null").ok:
+        open_hub(phone, evidence)
     install_and_open(phone, evidence, "Visual Studio Code", "vscode", "vscode/usr/share/code/code", timeout=1800)
     v = phone.sh("cat ~/.local/share/ucrom-apps/vscode/VERSION; "
                  "file ~/.local/share/ucrom-apps/vscode/usr/share/code/code", user=True)
     evidence.note(v.out.strip())
     assert "aarch64" in v.out
-    phone.sh("pkill -f vscode/usr/share/code; true")
+    phone.sh("pkill -f '[v]scode/usr/share/code'; true")
 
 
 def test_python_ai_tool_via_pipx(phone, online, evidence):
