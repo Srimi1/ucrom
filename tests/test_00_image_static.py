@@ -109,3 +109,10 @@ def test_ucrom_apps_installed():
             target = Path(os.readlink(p))
             p = FS / str(target).lstrip("/") if target.is_absolute() else p.parent / target
         assert p.exists(), f
+
+
+def test_network_manager_manages_all_devices():
+    """NetworkManager manages every network device (USB Ethernet, USB tethering too)"""
+    override = FS / "etc/NetworkManager/conf.d/10-globally-managed-devices.conf"
+    assert override.exists(), "Ubuntu's 'only Wi-Fi and WWAN are managed' default must be overridden"
+    assert not [ln for ln in override.read_text().splitlines() if ln.strip() and not ln.startswith("#")]

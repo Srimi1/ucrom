@@ -7,9 +7,12 @@ import time
 
 import pytest
 
+import ui
+
 pytestmark = pytest.mark.vm
 
-PY = "PYTHONPATH=/usr/lib/ucrom/daemons python3"
+# "env" so it also works after nohup/timeout
+PY = "env PYTHONPATH=/usr/lib/ucrom/daemons python3"
 
 
 SLIDER = r"""
@@ -24,7 +27,14 @@ pos = int(sys.argv[1])
 ui = UInput({e.EV_KEY: [e.KEY_F3]}, name="oplus,hall_tri_state_key", bustype=e.BUS_HOST)
 time.sleep(1)
 open("/tmp/hw/ucrom-input-map", "w").write(f"oplus,hall_tri_state_key={ui.device.path}\n")
-time.sleep(5)
+# move the slider only once the helper holds the device open (it records
+# the device it listens on); python starts slowly under emulation
+import os
+for _ in range(120):
+    if os.path.exists("/tmp/hwstate/alertslider-device"):
+        break
+    time.sleep(0.5)
+time.sleep(1)
 ui.write(e.EV_KEY, e.KEY_F3, pos); ui.syn()
 ui.write(e.EV_KEY, e.KEY_F3, 0); ui.syn()
 time.sleep(2)
@@ -38,15 +48,16 @@ def test_alert_slider(phone, evidence):
     """Alert slider: up/middle/down switch silent / vibrate / ring"""
     phone.sh(SLIDER)
     for pos, want in ((1, "up silent"), (2, "middle quiet"), (3, "down full")):
-        phone.sh(f"rm -f /tmp/hw/ucrom-input-map; nohup python3 /tmp/slider.py {pos} >/tmp/slider.log 2>&1 &")
+        phone.sh("rm -f /tmp/hw/ucrom-input-map /tmp/hwstate/alertslider-device")
+        phone.sh(f"nohup python3 /tmp/slider.py {pos} >/tmp/slider.log 2>&1 &")
         phone.wait_until("test -s /tmp/hw/ucrom-input-map", timeout=20, interval=0.5)
         if pos == 1:
             dev = phone.sh("udevadm settle; udevadm info -q property -n $(sed 's/.*=//' /tmp/hw/ucrom-input-map)").out
             evidence.note("virtual slider is ID_INPUT_KEY=1, not a keyboard, not blocked: "
                           + str("ID_INPUT_KEYBOARD" not in dev and "UCROM_BLOCKED" not in dev))
             assert "UCROM_BLOCKED" not in dev, "the slider must not be blocked by the touch-only policy"
-        r = phone.sh(f"UCROM_HW_ROOT=/tmp/hw UCROM_STATE_DIR=/tmp/hwstate timeout 20 {PY} -m ucromhw.alertslider --once; "
-                     "cat /tmp/hwstate/alertslider", user=True, timeout=60)
+        r = phone.sh(f"UCROM_HW_ROOT=/tmp/hw UCROM_STATE_DIR=/tmp/hwstate timeout 90 {PY} -m ucromhw.alertslider --once; "
+                     "cat /tmp/hwstate/alertslider", user=True, timeout=120)
         got = r.out.strip().splitlines()[-1] if r.out.strip() else ""
         prof = phone.sh("gsettings get org.sigxcpu.feedbackd profile", user=True).out.strip().strip("'")
         evidence.note(f"slider position {pos} -> '{got}', feedbackd profile '{prof}'")
@@ -85,6 +96,13 @@ sleep 3
 
 def test_popup_camera(phone, evidence):
     """Pop-up camera rises with the front camera and drops on a fall"""
+    try:
+        _popup_flow(phone, evidence)
+    finally:
+        phone.sh("pkill -f '[u]cromhw.popupcamera'; pkill -f '[m]otor-sim.sh'; true")
+
+
+def _popup_flow(phone, evidence):
     phone.sh(MOTOR_SIM, timeout=60)
     pos = lambda: phone.sh("cat /tmp/hw2/sys/class/motor/position").out.strip()
     assert pos() == "1", "starts down"
@@ -103,7 +121,6 @@ def test_popup_camera(phone, evidence):
     log = phone.sh("cat /tmp/popup.log; tail -3 /tmp/motor-moves.log").out
     evidence.note(f"free fall at {t0}; helper log:\n" + log.strip())
     assert "free fall" in log
-    phone.sh("pkill -f '[u]cromhw.popupcamera'; pkill -f '[m]otor-sim.sh'; true")
 
 
 def test_dumpsys_parser():
@@ -166,6 +183,18 @@ sleep 2
 
 def test_fingerprint_unlock_and_sensor_light(phone, evidence):
     """In-display fingerprint: locking starts a scan, the sensor lights up, a match unlocks"""
+    try:
+        _fingerprint_flow(phone, evidence)
+    finally:
+        # always stop the stand-in service: later tests (Hardware Check) must
+        # see an emulator without a fingerprint sensor
+        phone.sh("pkill -f '[u]cromhw.fod'; pkill -f '[f]ake-fpd.py'; "
+                 "rm -f /etc/dbus-1/system.d/ucrom-test-fpd.conf /tmp/fpd-identify-called; "
+                 "busctl call org.freedesktop.DBus / org.freedesktop.DBus ReloadConfig >/dev/null; true")
+
+
+def _fingerprint_flow(phone, evidence):
+    phone.sh("rm -f /tmp/fpd-identify-called")
     phone.sh(FAKE_FPD, timeout=60)
     phone.sh(f"UCROM_HW_ROOT=/tmp/hw3 UCROM_STATE_DIR=/tmp/hw3state nohup {PY} -m ucromhw.fod > /tmp/fod.log 2>&1 &",
              user=True)
@@ -186,14 +215,19 @@ def test_fingerprint_unlock_and_sensor_light(phone, evidence):
     assert "right-thumb" in log
     assert "sensor light on" in log and "sensor light off" in log
     assert log.strip().endswith("0"), "sensor light is off again after the scan"
-    phone.sh("pkill -f '[u]cromhw.fod'; pkill -f '[f]ake-fpd.py'; rm -f /etc/dbus-1/system.d/ucrom-test-fpd.conf; true")
+    assert not ui.is_locked(phone), "lock screen still showing after the fingerprint match"
 
 
 def test_refresh_rate_helper(phone, evidence):
     """Refresh-rate helper finds the panel and applies a mode"""
-    r = phone.sh(f"{PY} -m ucromhw.refreshrate 60 2>&1; wlr-randr", user=True)
-    evidence.note(r.out.strip()[:600])
+    cur = lambda: [ln.split(",")[0].strip() for ln in phone.sh("wlr-randr", user=True).out.splitlines()
+                   if "current" in ln]
+    before = cur()
+    r = phone.sh(f"{PY} -m ucromhw.refreshrate 60 2>&1", user=True)
+    after = cur()
+    evidence.note(f"{r.out.strip()[:300]} | current mode before {before}, after {after}")
     assert r.ok and " -> " in r.out
+    assert before and after == before, "only the refresh rate may change, never the resolution"
 
 
 def test_hardware_check_in_emulator(phone, evidence):
@@ -209,3 +243,16 @@ def test_hardware_check_in_emulator(phone, evidence):
         assert results[absent]["status"] == "ABSENT", absent
     assert not [x for x in results.values() if x["status"] == "FAIL"]
     assert "ucrom-hardware-report.html" in phone.sh("ls /home/ucrom").out
+
+
+def test_refresh_rate_keeps_resolution():
+    """Refresh-rate choice keeps the panel's resolution (7T Pro: 1440x3120 at 60/90 Hz)"""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ucrom"))
+    from ucromhw.refreshrate import parse_modes, pick
+    out = ("DSI-1 \"panel\"\n  Modes:\n    1440x3120 px, 90.000000 Hz (preferred, current)\n"
+           "    1440x3120 px, 60.000000 Hz\n    3840x2160 px, 60.000000 Hz\n")
+    modes = parse_modes(out)["DSI-1"]
+    assert pick(modes, 60)[:3] == (1440, 3120, 60.0)
+    assert pick(modes, 90)[:3] == (1440, 3120, 90.0)
