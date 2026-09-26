@@ -20,7 +20,10 @@ from vm import PhoneVM, VMError
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORT_DIR = ROOT / "docs" / "test-report"
-SHOTS = REPORT_DIR / "screenshots"
+# Only `--ucrom-report` (make report) writes into docs/; any other run keeps
+# its evidence under build/ so it never mixes into the committed report.
+EVIDENCE_DIR = ROOT / "build" / "test-evidence"
+SHOTS = EVIDENCE_DIR / "screenshots"
 BUILD = ROOT / "build"
 OUT = ROOT / "out"
 
@@ -34,7 +37,9 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "vm: needs the booted emulator phone")
+    global SHOTS
     if config.getoption("--ucrom-report"):
+        SHOTS = REPORT_DIR / "screenshots"
         if SHOTS.exists():
             shutil.rmtree(SHOTS)
         SHOTS.mkdir(parents=True, exist_ok=True)
@@ -52,7 +57,7 @@ class Evidence:
 
     def screenshot(self, vm: PhoneVM, label: str) -> Path:
         p = vm.screenshot(self.shot_path(label))
-        self.rec["shots"].append({"file": str(p.relative_to(REPORT_DIR)), "label": label})
+        self.rec["shots"].append({"file": str(p.relative_to(SHOTS.parent)), "label": label})
         return p
 
     def note(self, text: str):
