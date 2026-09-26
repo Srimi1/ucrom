@@ -19,7 +19,9 @@ cat > /tmp/slider.py <<'PY'
 import sys, time
 from evdev import UInput, ecodes as e
 pos = int(sys.argv[1])
-ui = UInput({e.EV_KEY: [e.KEY_F3]}, name="oplus,hall_tri_state_key")
+# bustype: the vendor driver is a platform device (BUS_HOST); uinput defaults
+# to BUS_USB, which the touch-only policy blocks like any USB input
+ui = UInput({e.EV_KEY: [e.KEY_F3]}, name="oplus,hall_tri_state_key", bustype=e.BUS_HOST)
 time.sleep(1)
 open("/tmp/hw/ucrom-input-map", "w").write(f"oplus,hall_tri_state_key={ui.device.path}\n")
 time.sleep(5)
