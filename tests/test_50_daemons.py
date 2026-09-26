@@ -76,9 +76,9 @@ SH
 rm -f /tmp/motor-moves.log
 nohup bash /tmp/motor-sim.sh >/dev/null 2>&1 &
 ln -s /proc/* /tmp/hw2/proc/ 2>/dev/null || true
-UCROM_HW_ROOT=/tmp/hw2 UCROM_STATE_DIR=/tmp/hw2state nohup %s -m ucromhw.popupcamera --mode mainline > /tmp/popup.log 2>&1 &
+UCROM_HW_ROOT=/tmp/hw2 UCROM_STATE_DIR=/tmp/hw2state nohup @PY@ -m ucromhw.popupcamera --mode mainline > /tmp/popup.log 2>&1 &
 sleep 3
-""" % PY
+""".replace("@PY@", PY)
 
 
 def test_popup_camera(phone, evidence):
