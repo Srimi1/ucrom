@@ -84,7 +84,11 @@ build_one() {
         local why; why=$(grep -E "Depends:|but it is not|Unable to locate|unmet" "$log" | tail -3 | tr '\n' ' ' | cut -c1-200)
         set_status "$name" FAIL "$commit" "build-deps: $why"; return 1
     fi
-    if ! chroot_run "$CHROOT" sh -c "cd $src && DEB_BUILD_OPTIONS='nocheck parallel=$(nproc)' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1; then
+    if ! chroot_run "$CHROOT" sh -c "cd $src && DEB_BUILD_OPTIONS='nocheck parallel=$(nproc)' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1 &&
+       ! { echo "ucrom: parallel build failed, retrying with one job (make ordering races)" >>"$log";
+           chroot_run "$CHROOT" sh -c "cd $src && git clean -fdxq -e debian && git checkout -q -- . && \
+               { [ ! -f debian/compat ] || [ \$(tr -dc 0-9 < debian/compat) -ge 10 ] || echo 10 > debian/compat; } && \
+               DEB_BUILD_OPTIONS='nocheck parallel=1' dpkg-buildpackage -us -uc -b -d" >>"$log" 2>&1; }; then
         local why; why=$(grep -iE "error" "$log" | tail -2 | tr '\n' ' ' | cut -c1-200)
         set_status "$name" FAIL "$commit" "build: $why"; return 1
     fi
