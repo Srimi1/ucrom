@@ -47,8 +47,10 @@ def wake(phone):
     import tempfile
     from pathlib import Path
     shot = Path(tempfile.mkdtemp()) / "wake.png"
+    from PIL import Image, ImageStat
     phone.screenshot(shot)
-    if "not active" in phone.ocr(shot):
+    dark = ImageStat.Stat(Image.open(shot).convert("L")).mean[0] < 3   # panel off
+    if dark or "not active" in phone.ocr(shot):
         phone.tap(phone.w / 2, phone.h / 2, hold=0.15)
         time.sleep(4)
 

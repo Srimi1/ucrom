@@ -9,6 +9,8 @@ import time
 
 import pytest
 
+import ui
+
 pytestmark = pytest.mark.vm
 
 INPUTS = r"""
@@ -45,6 +47,9 @@ def test_compositor_sees_only_touch(phone, evidence):
     assert not any("Keyboard" in n or "Mouse" in n for n in names)
 
 
+CURSOR_HOME = (190, 195, 240, 255)
+
+
 def _read_events(phone, name_part, seconds):
     """Start a raw evdev reader in the guest on the named device."""
     script = f"""
@@ -74,6 +79,7 @@ def test_hardware_keyboard_typing_does_nothing(phone, evidence):
     """Typing on the keyboard delivers zero events and changes nothing on screen"""
     # the lock screen shows a big clock: start just after a minute turns over
     # so the only thing that could change the screen is the keyboard
+    ui.wake(phone)   # compare the lit lock screen, not a blanked panel
     while int(phone.sh("date +%S").out.strip() or 0) > 15:
         time.sleep(2)
     _read_events(phone, "Keyboard", 20)
@@ -91,7 +97,12 @@ def test_hardware_keyboard_typing_does_nothing(phone, evidence):
     a, b = Image.open(before).convert("RGB"), Image.open(after).convert("RGB")
     # ignore the status bar (clock may tick)
     box = (0, 40, a.width, a.height)
-    diff = ImageChops.difference(a.crop(box), b.crop(box)).getbbox()
+    d = ImageChops.difference(a, b).convert("L")
+    # the (unused) pointer sprite rests at its start position and is drawn
+    # as a separate cursor plane that screendumps show intermittently; blank
+    # its spot. A pointer that moved would show up anywhere else.
+    d.paste(0, CURSOR_HOME)
+    diff = d.crop(box).getbbox()
     evidence.note(f"screen change below status bar: {diff}")
     assert diff is None
 
