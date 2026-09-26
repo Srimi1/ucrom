@@ -1,5 +1,6 @@
 """The built ucrom root filesystem, inspected on disk (no boot needed)."""
 
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -57,7 +58,9 @@ def test_udev_touch_only_rule(evidence):
                    "ID_INPUT_MOUSE", "ID_INPUT_TOUCHPAD", 'ATTRS{id/bustype}=="0003"',
                    'ATTRS{id/bustype}=="0005"'):
         assert needed in text, needed
-    r = subprocess.run(["udevadm", "verify", "--no-style", str(rule)], capture_output=True, text=True)
+    # use the image's own udevadm (the build host may have none)
+    r = subprocess.run(["chroot", str(FS), "udevadm", "verify", "--no-style",
+                        "/etc/udev/rules.d/90-ucrom-touch-only.rules"], capture_output=True, text=True)
     evidence.note(f"udevadm verify: rc={r.returncode} {r.stdout.strip() or r.stderr.strip()}")
     assert r.returncode == 0, r.stdout + r.stderr
 
@@ -101,4 +104,8 @@ def test_ucrom_apps_installed():
               "usr/bin/ucrom-popup-camera", "usr/bin/ucrom-fod", "usr/bin/ucrom-refresh-rate",
               "usr/share/applications/io.ucrom.AppHub.desktop",
               "usr/share/applications/io.ucrom.HardwareCheck.desktop"):
-        assert (FS / f).exists(), f
+        p = FS / f
+        if p.is_symlink():  # absolute links resolve inside the image, not on the host
+            target = Path(os.readlink(p))
+            p = FS / str(target).lstrip("/") if target.is_absolute() else p.parent / target
+        assert p.exists(), f
