@@ -1,0 +1,16 @@
+#!/bin/sh
+# Re-run the touch-only udev rules on every input device present at boot
+# and report the result. Safe to run at any time.
+set -eu
+udevadm trigger --subsystem-match=input --action=change
+udevadm settle --timeout=10 || true
+for dev in /sys/class/input/input*; do
+    [ -e "$dev/inhibited" ] || continue
+    name=$(cat "$dev/name" 2>/dev/null || echo "?")
+    state=$(cat "$dev/inhibited")
+    if [ "$state" = "1" ]; then
+        echo "blocked: $name"
+    else
+        echo "allowed: $name"
+    fi
+done

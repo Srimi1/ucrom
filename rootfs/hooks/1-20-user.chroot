@@ -1,0 +1,12 @@
+# The phone user. Its password is the numeric PIN typed on the lock screen pad.
+. /tmp/ucrom-hooks/ucrom.conf
+if ! id "$UCROM_USER" >/dev/null 2>&1; then
+    useradd -m -u 1000 -s /bin/bash -c "$UCROM_USER_FULLNAME" "$UCROM_USER"
+fi
+echo "$UCROM_USER:$UCROM_PIN" | chpasswd
+for g in sudo audio video input render plugdev netdev bluetooth dialout feedbackd; do
+    getent group "$g" >/dev/null && usermod -aG "$g" "$UCROM_USER"
+done
+# Root has no password login at all
+passwd -l root >/dev/null
+install -d -o "$UCROM_USER" -g "$UCROM_USER" "/home/$UCROM_USER/Projects"

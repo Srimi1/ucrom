@@ -1,0 +1,35 @@
+# ucrom touch-only input policy.
+#
+# ucrom is operated by touch only. Every keyboard, mouse, touchpad, pointing
+# stick, trackball, joystick or drawing tablet is shut off the moment it
+# appears, and so is any input device attached over USB or Bluetooth:
+#   * ATTR{inhibited}="1" on the kernel input device: the kernel stops
+#     delivering events to every reader (compositor, console, raw evdev).
+#   * LIBINPUT_IGNORE_DEVICE=1: libinput (and so the compositor) never opens it.
+# Allowed: touchscreens and the phone's own buttons (power, volume, alert
+# slider). Those are ID_INPUT_KEY / ID_INPUT_SWITCH but never ID_INPUT_KEYBOARD.
+
+ACTION=="remove", GOTO="ucrom_touch_only_end"
+SUBSYSTEM!="input", GOTO="ucrom_touch_only_end"
+
+# External buses are never trusted: 0003 = USB, 0005 = Bluetooth.
+ATTRS{id/bustype}=="0003", GOTO="ucrom_touch_only_block"
+ATTRS{id/bustype}=="0005", GOTO="ucrom_touch_only_block"
+
+ENV{ID_INPUT_TOUCHSCREEN}=="1", GOTO="ucrom_touch_only_end"
+
+ENV{ID_INPUT_KEYBOARD}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_MOUSE}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_TOUCHPAD}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_POINTINGSTICK}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_TRACKBALL}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_JOYSTICK}=="1", GOTO="ucrom_touch_only_block"
+ENV{ID_INPUT_TABLET}=="1", GOTO="ucrom_touch_only_block"
+GOTO="ucrom_touch_only_end"
+
+LABEL="ucrom_touch_only_block"
+ENV{UCROM_BLOCKED}="1"
+ENV{LIBINPUT_IGNORE_DEVICE}="1"
+KERNEL=="input[0-9]*", ATTR{inhibited}="1"
+
+LABEL="ucrom_touch_only_end"

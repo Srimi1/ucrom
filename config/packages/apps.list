@@ -1,0 +1,29 @@
+# Phone apps
+gnome-calls
+chatty
+gnome-contacts
+epiphany-browser
+gnome-calculator
+gnome-clocks
+gnome-text-editor
+gnome-weather
+portfolio-filemanager
+gnome-console
+megapixels
+# Developer / AI tooling
+git
+pipx
+python3-venv
+flatpak
+# Runtime libraries for Electron apps (VS Code, Antigravity) and X11-only apps
+xwayland
+libnss3
+libxkbfile1
+libsecret-1-0
+libgbm1
+libasound2t64
+libxss1
+xdg-utils
+# App Hub
+python3-requests
+file

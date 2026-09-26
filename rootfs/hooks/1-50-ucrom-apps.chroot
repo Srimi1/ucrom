@@ -1,0 +1,13 @@
+# Install ucrom's own apps (App Hub, Hardware Check) as system apps
+chmod +x /usr/lib/ucrom/apps/installers/*.sh /usr/lib/ucrom/apps/*/*.py 2>/dev/null || true
+for app in apphub hwcheck; do
+    dir=/usr/lib/ucrom/apps/$app
+    [ -d "$dir" ] || continue
+    ln -sf "$dir/$app.py" "/usr/bin/ucrom-$app"
+    for d in "$dir"/*.desktop; do
+        [ -e "$d" ] && install -m 644 "$d" /usr/share/applications/
+    done
+done
+update-desktop-database /usr/share/applications 2>/dev/null || true
+# The touch terminal: gnome-console
+command -v kgx >/dev/null

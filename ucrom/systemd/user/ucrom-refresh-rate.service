@@ -1,0 +1,13 @@
+[Unit]
+Description=ucrom panel refresh rate (60/90 Hz)
+ConditionPathExists=/etc/ucrom-device
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+# The compositor may still be starting; retry a few times
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/bin/ucrom-refresh-rate
+
+[Install]
+WantedBy=default.target

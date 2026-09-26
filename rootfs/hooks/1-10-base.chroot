@@ -1,0 +1,43 @@
+# Locale, time zone, hostname and ucrom branding
+. /tmp/ucrom-hooks/ucrom.conf
+locale-gen "$UCROM_LOCALE" >/dev/null
+update-locale LANG="$UCROM_LOCALE"
+ln -sf "/usr/share/zoneinfo/$UCROM_TIMEZONE" /etc/localtime
+echo "$UCROM_TIMEZONE" > /etc/timezone
+echo "$UCROM_HOSTNAME" > /etc/hostname
+cat > /etc/hosts <<EOT
+127.0.0.1 localhost
+127.0.1.1 $UCROM_HOSTNAME
+::1 localhost ip6-localhost ip6-loopback
+EOT
+
+# /etc/os-release is what Settings > About and every tool reads
+rm -f /etc/os-release
+cat > /usr/lib/os-release <<EOT
+NAME="$UCROM_NAME"
+VERSION="$UCROM_VERSION ($UCROM_CODENAME)"
+ID=$UCROM_NAME
+ID_LIKE="ubuntu debian"
+PRETTY_NAME="$UCROM_NAME $UCROM_VERSION"
+VERSION_ID="$UCROM_VERSION"
+VERSION_CODENAME=$UCROM_SUITE
+UBUNTU_CODENAME=$UCROM_SUITE
+HOME_URL="https://github.com/srimi1/ucrom"
+SUPPORT_URL="https://github.com/srimi1/ucrom/issues"
+LOGO=phone
+EOT
+ln -sf ../usr/lib/os-release /etc/os-release
+echo "$UCROM_NAME $UCROM_VERSION \\n \\l" > /etc/issue
+echo "$UCROM_NAME $UCROM_VERSION" > /etc/issue.net
+cat > /etc/lsb-release <<EOT
+DISTRIB_ID=$UCROM_NAME
+DISTRIB_RELEASE=$UCROM_VERSION
+DISTRIB_CODENAME=$UCROM_SUITE
+DISTRIB_DESCRIPTION="$UCROM_NAME $UCROM_VERSION"
+EOT
+# Keep apt from undoing the branding on base-files upgrades
+if ! dpkg-divert --list /usr/lib/os-release | grep -q ucrom; then
+    cp /usr/lib/os-release /tmp/ucrom-os-release
+    dpkg-divert --package ucrom --rename --divert /usr/lib/os-release.ubuntu --add /usr/lib/os-release
+    cp /tmp/ucrom-os-release /usr/lib/os-release
+fi

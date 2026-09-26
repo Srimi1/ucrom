@@ -1,0 +1,24 @@
+# ucrom defaults (users can still change them in Settings).
+
+[org/gnome/desktop/a11y/applications]
+screen-keyboard-enabled=true
+
+[sm/puri/phoc]
+scale-to-fit=true
+
+[sm/puri/phosh]
+favorites=['org.gnome.Calls.desktop', 'sm.puri.Chatty.desktop', 'org.gnome.Epiphany.desktop', 'org.gnome.Calculator.desktop', 'io.ucrom.AppHub.desktop', 'io.ucrom.HardwareCheck.desktop', 'org.gnome.Console.desktop', 'org.gnome.Settings.desktop']
+
+[org/gnome/desktop/screensaver]
+lock-enabled=true
+lock-delay=uint32 0
+
+[org/gnome/desktop/session]
+idle-delay=uint32 120
+
+[org/gnome/desktop/interface]
+color-scheme='prefer-dark'
+enable-animations=true
+
+[org/gnome/desktop/privacy]
+report-technical-problems=false

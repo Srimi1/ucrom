@@ -1,0 +1,7 @@
+# Hardware flavor: Halium (Android driver bridge) devices.
+# Ubuntu-archive parts; bridge packages are built from packages/ by build-bridges.sh
+lxc
+pulseaudio
+pulseaudio-module-bluetooth
+gir1.2-gtklayershell-0.1
+gir1.2-gtk-3.0

@@ -32,3 +32,12 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# ucrom build outputs (large; rebuilt by make)
+/build/
+/out/
+*.img
+*.qcow2
+*.raw
+__pycache__/
+.pytest_cache/

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=App Hub
+Comment=Install AI agents and developer apps with one tap
+Exec=/usr/bin/ucrom-apphub
+Icon=system-software-install
+Categories=System;PackageManager;
+StartupNotify=true
+X-Purism-FormFactor=Workstation;Mobile;

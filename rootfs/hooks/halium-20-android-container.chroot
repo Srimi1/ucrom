@@ -1,0 +1,4 @@
+# Halium: the Android driver container starts from the image the initramfs
+# mounted; bridges talk to it over binder. Keep its binderfs mounted early.
+mkdir -p /var/lib/lxc/android
+systemctl enable lxc-android.service 2>/dev/null || true

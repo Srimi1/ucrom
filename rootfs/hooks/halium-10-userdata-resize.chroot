@@ -1,0 +1,17 @@
+# userdata.img is flashed as a 12 GB filesystem; grow it to the whole
+# userdata partition (115 GB on the 7T Pro) on first boot, online.
+cat > /usr/lib/systemd/system/ucrom-grow-userdata.service <<'EOT'
+[Unit]
+Description=ucrom: grow the userdata filesystem to the full partition (first boot)
+ConditionPathExists=!/var/lib/ucrom/userdata-grown
+ConditionPathExists=/dev/disk/by-partlabel/userdata
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/resize2fs /dev/disk/by-partlabel/userdata
+ExecStartPost=/bin/sh -c 'mkdir -p /var/lib/ucrom && touch /var/lib/ucrom/userdata-grown'
+
+[Install]
+WantedBy=multi-user.target
+EOT
+systemctl enable ucrom-grow-userdata.service
