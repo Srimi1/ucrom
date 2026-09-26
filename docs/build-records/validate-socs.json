@@ -1,0 +1,404 @@
+[
+ {
+  "device": "oneplus-cheeseburger",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 835 / mainline"
+ },
+ {
+  "device": "oneplus-cheeseburger",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/msm8998-mainline/linux @ master"
+ },
+ {
+  "device": "oneplus-cheeseburger",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/msm8998-oneplus-cheeseburger"
+ },
+ {
+  "device": "oneplus-cheeseburger",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_msm8998 @ lineage-22.2"
+ },
+ {
+  "device": "oneplus-cheeseburger",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "lineage_oneplus5_defconfig"
+ },
+ {
+  "device": "oneplus-dumpling",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 835 / mainline"
+ },
+ {
+  "device": "oneplus-dumpling",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/msm8998-mainline/linux @ master"
+ },
+ {
+  "device": "oneplus-dumpling",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/msm8998-oneplus-dumpling"
+ },
+ {
+  "device": "oneplus-dumpling",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_msm8998 @ lineage-22.2"
+ },
+ {
+  "device": "oneplus-dumpling",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "lineage_oneplus5_defconfig"
+ },
+ {
+  "device": "oneplus-enchilada",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 845 / mainline"
+ },
+ {
+  "device": "oneplus-enchilada",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sdm845-mainline/linux @ sdm845-6.11"
+ },
+ {
+  "device": "oneplus-enchilada",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sdm845-oneplus-enchilada"
+ },
+ {
+  "device": "oneplus-enchilada",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sdm845 @ lineage-22.2"
+ },
+ {
+  "device": "oneplus-enchilada",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sdm845-perf_defconfig"
+ },
+ {
+  "device": "oneplus-fajita",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 845 / mainline"
+ },
+ {
+  "device": "oneplus-fajita",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sdm845-mainline/linux @ sdm845-6.11"
+ },
+ {
+  "device": "oneplus-fajita",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sdm845-oneplus-fajita"
+ },
+ {
+  "device": "oneplus-fajita",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sdm845 @ lineage-22.2"
+ },
+ {
+  "device": "oneplus-fajita",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sdm845-perf_defconfig"
+ },
+ {
+  "device": "oneplus-guacamole",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 855/855+ / halium"
+ },
+ {
+  "device": "oneplus-guacamole",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8150 @ lineage-20"
+ },
+ {
+  "device": "oneplus-guacamole",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sm8150-perf_defconfig"
+ },
+ {
+  "device": "oneplus-guacamole",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8150-mainline/linux @ sm8150/6.14"
+ },
+ {
+  "device": "oneplus-guacamole",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8150-oneplus-guacamole"
+ },
+ {
+  "device": "oneplus-hotdog",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 855/855+ / halium"
+ },
+ {
+  "device": "oneplus-hotdog",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8150 @ lineage-20"
+ },
+ {
+  "device": "oneplus-hotdog",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sm8150-perf_defconfig"
+ },
+ {
+  "device": "oneplus-hotdog",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8150-mainline/linux @ sm8150/6.14"
+ },
+ {
+  "device": "oneplus-hotdog",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8150-oneplus-hotdog (shipped by ucrom)"
+ },
+ {
+  "device": "oneplus-hotdogb",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 855/855+ / halium"
+ },
+ {
+  "device": "oneplus-hotdogb",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8150 @ lineage-20"
+ },
+ {
+  "device": "oneplus-hotdogb",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sm8150-perf_defconfig"
+ },
+ {
+  "device": "oneplus-hotdogb",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8150-mainline/linux @ sm8150/6.14"
+ },
+ {
+  "device": "oneplus-hotdogb",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8150-oneplus-hotdogb"
+ },
+ {
+  "device": "oneplus-hotdogg",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 855/855+ / halium"
+ },
+ {
+  "device": "oneplus-hotdogg",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8150 @ lineage-20"
+ },
+ {
+  "device": "oneplus-hotdogg",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/sm8150-perf_defconfig"
+ },
+ {
+  "device": "oneplus-hotdogg",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8150-mainline/linux @ sm8150/6.14"
+ },
+ {
+  "device": "oneplus-instantnoodlep",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 865/865+/870 / mainline"
+ },
+ {
+  "device": "oneplus-instantnoodlep",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8250-mainline/linux @ sm8250-6.11.0"
+ },
+ {
+  "device": "oneplus-instantnoodlep",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8250-oneplus-instantnoodlep"
+ },
+ {
+  "device": "oneplus-instantnoodlep",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8250 @ lineage-23.2"
+ },
+ {
+  "device": "oneplus-instantnoodlep",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/kona-perf_defconfig"
+ },
+ {
+  "device": "oneplus-kebab",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 865/865+/870 / halium"
+ },
+ {
+  "device": "oneplus-kebab",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8250-mainline/linux @ sm8250-6.11.0"
+ },
+ {
+  "device": "oneplus-kebab",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8250 @ lineage-23.2"
+ },
+ {
+  "device": "oneplus-kebab",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/kona-perf_defconfig"
+ },
+ {
+  "device": "oneplus-lemonade",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 888 / mainline"
+ },
+ {
+  "device": "oneplus-lemonade",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8350-mainline/linux @ dev"
+ },
+ {
+  "device": "oneplus-lemonade",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8350-oneplus-lemonade"
+ },
+ {
+  "device": "oneplus-lemonade",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8350 @ lineage-23.2"
+ },
+ {
+  "device": "oneplus-lemonade",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/lahaina-qgki_defconfig"
+ },
+ {
+  "device": "oneplus-lemonadep",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 888 / mainline"
+ },
+ {
+  "device": "oneplus-lemonadep",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/sm8350-mainline/linux @ dev"
+ },
+ {
+  "device": "oneplus-lemonadep",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/sm8350-oneplus-lemonadep"
+ },
+ {
+  "device": "oneplus-lemonadep",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8350 @ lineage-23.2"
+ },
+ {
+  "device": "oneplus-lemonadep",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "vendor/lahaina-qgki_defconfig"
+ },
+ {
+  "device": "oneplus-oneplus3",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 820/821 / mainline"
+ },
+ {
+  "device": "oneplus-oneplus3",
+  "check": "mainline-kernel",
+  "result": "OK",
+  "detail": "https://gitlab.com/msm8996-mainline/linux @ msm8996-staging"
+ },
+ {
+  "device": "oneplus-oneplus3",
+  "check": "mainline-dts",
+  "result": "OK",
+  "detail": "qcom/msm8996-oneplus3"
+ },
+ {
+  "device": "oneplus-oneplus3",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_msm8996 @ lineage-18.1"
+ },
+ {
+  "device": "oneplus-oneplus3",
+  "check": "halium-defconfig",
+  "result": "OK",
+  "detail": "lineageos_oneplus3_defconfig"
+ },
+ {
+  "device": "oneplus-salami",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 8 Gen 2 / halium"
+ },
+ {
+  "device": "oneplus-salami",
+  "check": "halium-kernel",
+  "result": "OK",
+  "detail": "https://github.com/LineageOS/android_kernel_oneplus_sm8550 @ lineage-23.2"
+ },
+ {
+  "device": "oneplus-waffle",
+  "check": "resolve",
+  "result": "OK",
+  "detail": "Snapdragon 8 Gen 3 / halium"
+ },
+ {
+  "device": "oneplus-waffle",
+  "check": "halium-kernel",
+  "result": "NONE",
+  "detail": "no halium kernel published for sm8650"
+ }
+]

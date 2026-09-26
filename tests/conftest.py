@@ -23,6 +23,7 @@ REPORT_DIR = ROOT / "docs" / "test-report"
 # Only `--ucrom-report` (make report) writes into docs/; any other run keeps
 # its evidence under build/ so it never mixes into the committed report.
 EVIDENCE_DIR = ROOT / "build" / "test-evidence"
+STAGING = ROOT / "build" / "test-report-staging"
 SHOTS = EVIDENCE_DIR / "screenshots"
 BUILD = ROOT / "build"
 OUT = ROOT / "out"
@@ -39,7 +40,11 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "vm: needs the booted emulator phone")
     global SHOTS
     if config.getoption("--ucrom-report"):
-        SHOTS = REPORT_DIR / "screenshots"
+        # built in a staging folder and moved into docs/ only at the end, so
+        # the repository never holds a half-written report
+        SHOTS = STAGING / "screenshots"
+        if STAGING.exists():
+            shutil.rmtree(STAGING)
         if SHOTS.exists():
             shutil.rmtree(SHOTS)
         SHOTS.mkdir(parents=True, exist_ok=True)
@@ -80,6 +85,10 @@ def phone():
     vm.start()
     try:
         vm.boot_seconds = vm.wait_for_agent(timeout=float(os.environ.get("UCROM_BOOT_TIMEOUT", "1500")))
+        # The guest agent answers before boot has finished. Wait for systemd
+        # and for udev to have applied every rule (the touch-only policy is a
+        # udev rule), so no test sees a half-booted phone.
+        vm.sh("timeout 900 systemctl is-system-running --wait; udevadm settle --timeout=300", timeout=1300)
         yield vm
     finally:
         vm.stop()
@@ -123,11 +132,14 @@ def _versions():
 def pytest_sessionfinish(session, exitstatus):
     if not session.config.getoption("--ucrom-report"):
         return
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    STAGING.mkdir(parents=True, exist_ok=True)
     tests = {k: v for k, v in _records.items() if not k.startswith("_") and "outcome" in v}
     data = {"generated": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
             "versions": _versions(), "tests": tests,
             "vm": _records.get("_vm", {})}
-    (REPORT_DIR / "results.json").write_text(json.dumps(data, indent=1))
+    (STAGING / "results.json").write_text(json.dumps(data, indent=1))
     from report import write_markdown
-    write_markdown(data, REPORT_DIR / "REPORT.md")
+    write_markdown(data, STAGING / "REPORT.md")
+    if REPORT_DIR.exists():
+        shutil.rmtree(REPORT_DIR)
+    shutil.copytree(STAGING, REPORT_DIR)

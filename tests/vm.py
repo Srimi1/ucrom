@@ -496,6 +496,17 @@ class PhoneVM:
         self.usb_devices.append(dev_id)
         return dev_id
 
+    def unplug_usb(self) -> None:
+        """Remove hot-plugged USB devices. While a USB mouse is plugged in,
+        QEMU routes injected button events to it instead of the touchscreen,
+        so touch taps stop working for every later test. (Naming the target
+        device in input-send-event would avoid that, but QEMU aborts when
+        the device has no display console.)"""
+        for dev_id in self.usb_devices:
+            self.qmp.cmd("device_del", id=dev_id)
+        self.usb_devices.clear()
+        time.sleep(3)
+
 
 def have_qemu() -> bool:
     return shutil.which("qemu-system-aarch64") is not None
