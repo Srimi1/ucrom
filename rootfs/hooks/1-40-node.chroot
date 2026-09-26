@@ -3,7 +3,12 @@
 want="v$UCROM_NODE_VERSION"
 if [ "$(/opt/node/bin/node --version 2>/dev/null)" != "$want" ]; then
     tarball="node-$want-linux-arm64.tar.xz"
-    curl -fsSL --retry 5 -o "/tmp/$tarball" "https://nodejs.org/dist/$want/$tarball"
+    # fetched by build-rootfs.sh on the host; download here only as a fallback
+    if [ -f "/tmp/ucrom-hooks/$tarball" ]; then
+        cp "/tmp/ucrom-hooks/$tarball" "/tmp/$tarball"
+    else
+        curl -fsSL --retry 5 --retry-all-errors -o "/tmp/$tarball" "https://nodejs.org/dist/$want/$tarball"
+    fi
     echo "$UCROM_NODE_SHA256  /tmp/$tarball" | sha256sum -c -
     rm -rf /opt/node && mkdir -p /opt/node
     tar -C /opt/node --strip-components=1 -xJf "/tmp/$tarball"
