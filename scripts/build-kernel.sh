@@ -32,6 +32,16 @@ if [ ! -d "$SRC_DIR/.git" ]; then
     retry 3 git clone --depth 1 -b "$REF" "$REPO" "$SRC_DIR"
 fi
 COMMIT=$(git -C "$SRC_DIR" rev-parse HEAD)
+
+# ucrom kernel patches (toolchain fixes etc.), applied once, in order
+for p in "$UCROM_ROOT"/socs/"$SOC_ID"/patches/"$FLAVOR"/*.patch "$DEVICE_DIR"/patches/"$FLAVOR"/*.patch; do
+    [ -e "$p" ] || continue
+    if git -C "$SRC_DIR" apply --reverse --check "$p" 2>/dev/null; then
+        continue
+    fi
+    log "applying $(basename "$p")"
+    git -C "$SRC_DIR" apply "$p" || die "patch $(basename "$p") does not apply"
+done
 log "$DEV ($DEVICE_NAME): $FLAVOR kernel $REPO @ $REF ($COMMIT)"
 
 # Old Android kernels pass "--prefix=<dir of ${CROSS_COMPILE}elfedit>" to clang,

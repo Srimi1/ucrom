@@ -1,0 +1,20 @@
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index b43531899..e38867e37 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -135,6 +135,15 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+ 	if (symbol_prefix_char && str[0] == symbol_prefix_char)
+ 		sym++;
+ 
++	/*
++	 * Newer binutils (>= 2.36) emit linker-script values such as
++	 * _kernel_size_le_lo32 as section-relative symbols with tiny values.
++	 * They are not kernel addresses and break relative kallsyms; on arm64
++	 * every real kernel symbol lives in the top 0xffff... range.
++	 */
++	if ((s->addr >> 48) != 0xffff && strcmp(sym, "_text") != 0)
++		return -1;
++
+ 	/* Ignore most absolute/undefined (?) symbols. */
+ 	if (strcmp(sym, "_text") == 0)
+ 		_text = s->addr;
