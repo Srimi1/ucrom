@@ -155,9 +155,15 @@ log "creating userdata image"
 raw="$STAGE/userdata.raw"
 if [ "$FLAVOR" = halium ]; then
     # Halium file layout: /rootfs.img on userdata (found by the initramfs)
+    # Sized to its content plus headroom (not a fixed 8 GB): mke2fs -d fills
+    # the file, so a mostly empty fixed-size image would still cost its full
+    # size inside userdata. First boot grows it (ucrom-grow-userdata.service).
     rootimg="$STAGE/rootfs.img"
-    truncate -s "$UCROM_ROOTFS_SIZE" "$rootimg"
+    used_mb=$(du -sxm "$MERGED" | cut -f1)
+    root_mb=$(( used_mb * 13 / 10 + 512 ))
+    truncate -s "${root_mb}M" "$rootimg"
     mkfs.ext4 -q -F -L ucrom-root -d "$MERGED" "$rootimg"
+    log "rootfs.img: ${root_mb} MB for ${used_mb} MB of files"
     mkdir -p "$STAGE/userdata-content"
     mv "$rootimg" "$STAGE/userdata-content/rootfs.img"
     # The Android side (Halium system image). It cannot be built or fetched in
@@ -171,7 +177,8 @@ if [ "$FLAVOR" = halium ]; then
         warn "no HALIUM_SYSTEM_IMAGE given: userdata.img has no Android system image yet"
         echo "halium_system=missing" > "$STAGE/halium-system"
     fi
-    truncate -s 12G "$raw"
+    ud_mb=$(( $(du -sm "$STAGE/userdata-content" | cut -f1) + 1024 ))
+    truncate -s "${ud_mb}M" "$raw"
     mkfs.ext4 -q -F -L userdata -d "$STAGE/userdata-content" "$raw"
     rm -rf "$STAGE/userdata-content"
 else
