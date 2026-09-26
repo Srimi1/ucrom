@@ -15,6 +15,7 @@ zstd
 initramfs-tools
 kmod
 udev
+dconf-cli
 e2fsprogs
 network-manager
 wpasupplicant

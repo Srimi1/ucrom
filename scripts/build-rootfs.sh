@@ -48,6 +48,11 @@ install_ucrom_files() {
 
 build_common() {
     ensure_arm64_exec
+    # UCROM_RESUME=1: keep an already bootstrapped tree (e.g. after a hook
+    # failed) and only redo package installation and configuration
+    if [ "${UCROM_RESUME:-0}" = 1 ] && [ -x "$ROOT/usr/bin/apt-get" ]; then
+        log "resuming in existing $ROOT"
+    else
     rm -rf "$ROOT"; mkdir -p "$ROOT"
     log "bootstrapping Ubuntu $UCROM_SUITE $UCROM_ARCH from $UCROM_MIRROR"
     retry 3 mmdebstrap --mode=root --variant=minbase --arch="$UCROM_ARCH" \
@@ -59,6 +64,7 @@ build_common() {
         "deb $UCROM_MIRROR $UCROM_SUITE ${UCROM_COMPONENTS//,/ }" \
         "deb $UCROM_MIRROR $UCROM_SUITE-updates ${UCROM_COMPONENTS//,/ }" \
         "deb $UCROM_MIRROR $UCROM_SUITE-security ${UCROM_COMPONENTS//,/ }"
+    fi
 
     chroot_mount "$ROOT"
     build_ca_install "$ROOT"
