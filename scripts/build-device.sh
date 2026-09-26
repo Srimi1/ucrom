@@ -86,11 +86,22 @@ if [ "$FLAVOR" = halium ]; then
 else
     printf 'MODULES=most\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
 fi
+# initramfs hooks (Halium's) ask dpkg-architecture for the multiarch triplet;
+# a build-time shim avoids pulling the whole dpkg-dev toolchain into the phone
+SHIM=""
+if ! chroot_run "$MERGED" sh -c 'command -v dpkg-architecture' >/dev/null 2>&1; then
+    SHIM="$MERGED/usr/local/bin/dpkg-architecture"
+    printf '#!/bin/sh\n# ucrom build-time shim\ncase "$*" in *MULTIARCH*) echo aarch64-linux-gnu ;; *ARCH*) echo arm64 ;; esac\n' > "$SHIM"
+    chmod 755 "$SHIM"
+fi
+mkdir -p "$MERGED/boot"
+cp "$KDIR/config" "$MERGED/boot/config-$KREL"
 chroot_run "$MERGED" sh -c "mkinitramfs -o /tmp/ucrom-initrd.img $KREL" > "$STAGE/initramfs.log" 2>&1 ||
     die "initramfs failed: $(tail -5 "$STAGE/initramfs.log")"
 mkdir -p "$DEST"
 cp "$MERGED/tmp/ucrom-initrd.img" "$DEST/initrd.img"
 rm -f "$MERGED/tmp/ucrom-initrd.img" "$MERGED/etc/udev/rules.d/90-touchscreen.rules"
+[ -z "$SHIM" ] || rm -f "$SHIM"
 chroot_umount "$MERGED"
 
 # --- boot.img
