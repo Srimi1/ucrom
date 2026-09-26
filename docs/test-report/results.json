@@ -1,0 +1,1020 @@
+{
+ "generated": "2026-09-26 17:15:39 UTC",
+ "versions": {
+  "host": "Linux-6.18.44-fc-v42-x86_64-with-glibc2.39",
+  "qemu": "QEMU emulator version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.18)",
+  "tesseract": "tesseract 5.3.4",
+  "python": "3.11.15",
+  "emulator_image": [
+   "8c23ce9924d71c5160c9debcdddb3f51a9da2fed9ed904f8faa7ab972dbfc65a  ucrom-qemu.qcow2",
+   "71fe6776ef591ea452661a5933e11d2044c5df6aaf76cf39b8d9655fa4e47904  vmlinuz",
+   "f286be014ada43c7aeb47a0dd255fe011ed0ae386f5504998009ca32ad5c5aa4  initrd.img"
+  ]
+ },
+ "tests": {
+  "tests/test_00_image_static.py::test_branding": {
+   "shots": [],
+   "notes": [
+    "NAME=\"ucrom\" | VERSION=\"0.1 (touch)\" | ID=ucrom | ID_LIKE=\"ubuntu debian\" | PRETTY_NAME=\"ucrom 0.1\" | VERSION_ID=\"0.1\" | VERSION_CODENAME=noble | UBUNTU_CODENAME=noble | HOME_URL=\"https://github.com/srimi1/ucrom\" | SUPPORT_URL=\"https://github.com/srimi1/ucrom/issues\" | LOGO=phone"
+   ],
+   "title": "The OS identifies itself as ucrom",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_00_image_static.py::test_packages[phosh]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[phoc]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[phosh-osk-stub]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[gnome-calls]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[chatty]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[epiphany-browser]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[gnome-calculator]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[gnome-console]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[network-manager]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[modemmanager]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[bluez]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[feedbackd]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[iio-sensor-proxy]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[flatpak]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[pipx]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[git]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_packages[qemu-guest-agent]": {
+   "shots": [],
+   "notes": [],
+   "title": "Phone shell, apps and services are installed",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_node22_for_ai_agents": {
+   "shots": [],
+   "notes": [
+    "node v22.23.3"
+   ],
+   "title": "Node.js 22 is present for Claude Code / Codex",
+   "outcome": "passed",
+   "duration": 0.2
+  },
+  "tests/test_00_image_static.py::test_udev_touch_only_rule": {
+   "shots": [],
+   "notes": [
+    "udevadm verify: rc=0 1 udev rules files have been checked.\n  Success: 1\n  Fail:    0"
+   ],
+   "title": "Touch-only udev rule is installed and valid",
+   "outcome": "passed",
+   "duration": 0.1
+  },
+  "tests/test_00_image_static.py::test_hid_drivers_blocked": {
+   "shots": [],
+   "notes": [],
+   "title": "USB/Bluetooth keyboard & mouse drivers can never load",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_00_image_static.py::test_bluetooth_input_plugins_off": {
+   "shots": [],
+   "notes": [],
+   "title": "BlueZ cannot pair keyboards or mice",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_00_image_static.py::test_no_text_console": {
+   "shots": [],
+   "notes": [],
+   "title": "No login consoles, SysRq off, no SSH server, root locked",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_00_image_static.py::test_on_screen_keyboard_default": {
+   "shots": [],
+   "notes": [],
+   "title": "The on-screen keyboard is on by default",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_00_image_static.py::test_ucrom_apps_installed": {
+   "shots": [],
+   "notes": [],
+   "title": "App Hub, Hardware Check and the hardware helpers are installed",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_00_image_static.py::test_network_manager_manages_all_devices": {
+   "shots": [],
+   "notes": [],
+   "title": "NetworkManager manages every network device (USB Ethernet, USB tethering too)",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_10_boot.py::test_boots_to_touch_shell": {
+   "shots": [
+    {
+     "file": "screenshots/test_boots_to_touch_shell-01-first-screen.png",
+     "label": "first-screen"
+    }
+   ],
+   "notes": [
+    "guest agent answered after 76 s (arm64 under TCG emulation, no KVM)"
+   ],
+   "title": "Boots to the Phosh touch shell",
+   "outcome": "passed",
+   "duration": 87.5
+  },
+  "tests/test_10_boot.py::test_identity_in_guest": {
+   "shots": [],
+   "notes": [
+    "ucrom 0.1 | aarch64 | ucrom"
+   ],
+   "title": "The running system is ucrom on an arm64 kernel",
+   "outcome": "passed",
+   "duration": 0.6
+  },
+  "tests/test_10_boot.py::test_no_failed_services": {
+   "shots": [],
+   "notes": [
+    "failed units: none"
+   ],
+   "title": "No system service failed",
+   "outcome": "passed",
+   "duration": 0.6
+  },
+  "tests/test_10_boot.py::test_touch_session_user": {
+   "shots": [],
+   "notes": [
+    "phosh runs as: ucrom"
+   ],
+   "title": "The phone user's session runs Phosh (not root)",
+   "outcome": "passed",
+   "duration": 1.1
+  },
+  "tests/test_20_touch_only.py::test_kernel_inhibits_keyboard_and_mouse": {
+   "shots": [],
+   "notes": [
+    "gpio-keys: allowed",
+    "QEMU Virtio MultiTouch: allowed",
+    "QEMU Virtio Keyboard: BLOCKED",
+    "QEMU Virtio Mouse: BLOCKED"
+   ],
+   "title": "Keyboard and mouse are inhibited in the kernel; touchscreen is live",
+   "outcome": "passed",
+   "duration": 1.6
+  },
+  "tests/test_20_touch_only.py::test_compositor_sees_only_touch": {
+   "shots": [],
+   "notes": [
+    "libinput devices: QEMU Virtio MultiTouch, gpio-keys"
+   ],
+   "title": "libinput (what the shell uses) only sees the touchscreen and the power button",
+   "outcome": "passed",
+   "duration": 1.1
+  },
+  "tests/test_20_touch_only.py::test_hardware_keyboard_typing_does_nothing": {
+   "shots": [
+    {
+     "file": "screenshots/test_hardware_keyboard_typing_does_nothing-01-before-typing.png",
+     "label": "before-typing"
+    },
+    {
+     "file": "screenshots/test_hardware_keyboard_typing_does_nothing-02-after-typing.png",
+     "label": "after-typing"
+    }
+   ],
+   "notes": [
+    "events that reached the keyboard device node: 0",
+    "screen change below status bar: (156, 560, 564, 1335)"
+   ],
+   "title": "Typing on the keyboard delivers zero events and changes nothing on screen",
+   "outcome": "failed",
+   "duration": 68.3,
+   "error": "phone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d383fab50>\n\n    def test_hardware_keyboard_typing_does_nothing(phone, evidence):\n        \"\"\"Typing on the keyboard delivers zero events and changes nothing on screen\"\"\"\n        # the lock screen shows a big clock: start just after a minute turns over\n        # so the only thing that could change the screen is the keyboard\n        ui.wake(phone)   # compare the lit lock screen, not a blanked panel\n        while int(phone.sh(\"date +%S\").out.strip() or 0) > 15:\n            time.sleep(2)\n        _read_events(phone, \"Keyboard\", 20)\n        time.sleep(1)\n        before = evidence.screenshot(phone, \"before-typing\")\n        phone.type_on_hardware_keyboard(\"hello ucrom\\n\")\n        phone.type_on_hardware_keyboard(\"rm -rf /\\n\")\n        time.sleep(8)\n        after = evidence.screenshot(phone, \"after-typing\")\n        phone.wait_until(\"test -f /tmp/ucrom-evcount-Keyboard\", timeout=60, interval=1)\n        n = phone.sh(\"cat /tmp/ucrom-evcount-Keyboard\").out.strip()\n        evidence.note(f\"events that reached the keyboard device node: {n}\")\n        assert n == \"0\"\n        from PIL import Image, ImageChops\n        a, b = Image.open(before).convert(\"RGB\"), Image.open(after).convert(\"RGB\")\n        # ignore the status bar (clock may tick)\n        box = (0, 40, a.width, a.height)\n        d = ImageChops.difference(a, b).convert(\"L\")\n        # the (unused) pointer sprite rests at its start position and is drawn\n        # as a separate cursor plane that screendumps show intermittently; blank\n        # its spot. A pointer that moved would show up anywhere else.\n        d.paste(0, CURSOR_HOME)\n        diff = d.crop(box).getbbox()\n        evidence.note(f\"screen change below status bar: {diff}\")\n>       assert diff is None\nE       assert (156, 560, 564, 1335) is None\n\ntests/test_20_touch_only.py:107: AssertionError"
+  },
+  "tests/test_20_touch_only.py::test_mouse_does_nothing": {
+   "shots": [],
+   "notes": [
+    "events that reached the mouse device node: 0"
+   ],
+   "title": "Moving and clicking the mouse delivers zero events",
+   "outcome": "passed",
+   "duration": 27.8
+  },
+  "tests/test_20_touch_only.py::test_usb_keyboard_and_mouse_hotplug_blocked": {
+   "shots": [],
+   "notes": [
+    "USB devices (product|bound driver): QEMU USB Keyboard|; QEMU USB Mouse|; xHCI Host Controller|hub; xHCI Host Controller|hub",
+    "new input devices: none",
+    "explicit 'modprobe usbhid' -> rc=1 modprobe: ERROR: ../libkmod/libkmod-module.c:1084 command_do() Error running install command '/bin/false' for module usbhid: retcode 1\nmodprobe: ERROR: could not insert 'usbhid': Invalid argument"
+   ],
+   "title": "Plugging in a USB keyboard and mouse: no driver ever binds",
+   "outcome": "passed",
+   "duration": 15.8
+  },
+  "tests/test_20_touch_only.py::test_no_keyboard_escape_hatches": {
+   "shots": [],
+   "notes": [
+    "getty processes: none"
+   ],
+   "title": "No SysRq, no text consoles, no SSH",
+   "outcome": "passed",
+   "duration": 3.8
+  },
+  "tests/test_20_touch_only.py::test_touch_is_delivered": {
+   "shots": [],
+   "notes": [
+    "touch events delivered for one tap: 2"
+   ],
+   "title": "Touches on the screen do reach the system",
+   "outcome": "passed",
+   "duration": 21.6
+  },
+  "tests/test_30_touch_ux.py::test_unlock_with_pin_pad": {
+   "shots": [
+    {
+     "file": "screenshots/test_unlock_with_pin_pad-01-lockscreen.png",
+     "label": "lockscreen"
+    },
+    {
+     "file": "screenshots/test_unlock_with_pin_pad-02-pin-pad.png",
+     "label": "pin-pad"
+    },
+    {
+     "file": "screenshots/test_unlock_with_pin_pad-03-pin-typed.png",
+     "label": "pin-typed"
+    },
+    {
+     "file": "screenshots/test_unlock_with_pin_pad-04-home.png",
+     "label": "home"
+    }
+   ],
+   "notes": [
+    "PIN pad keys located and read back by OCR: 1->'1', 2->'2', 4->'4', 5->'5', 7->'7', 8->'8'",
+    "unlocked by touch in 29 s"
+   ],
+   "title": "Swipe up, tap the PIN on the pad, phone unlocks",
+   "outcome": "passed",
+   "duration": 53.1
+  },
+  "tests/test_30_touch_ux.py::test_calculator_by_touch": {
+   "shots": [
+    {
+     "file": "screenshots/test_calculator_by_touch-01-app-grid.png",
+     "label": "app-grid"
+    },
+    {
+     "file": "screenshots/test_calculator_by_touch-02-calculator.png",
+     "label": "calculator"
+    }
+   ],
+   "notes": [
+    "calculator keys located from the 'mod' button, read back by OCR: C->'C', 7->'7', x->'x', 6->'6', =->'a'",
+    "no result yet, tapping '=' again (attempt 2)",
+    "no result yet, tapping '=' again (attempt 3)",
+    "no result yet, tapping '=' again (attempt 4)"
+   ],
+   "title": "Open Calculator from the app grid and compute 7 \u00d7 6 by tapping",
+   "outcome": "failed",
+   "duration": 239.5,
+   "error": "hone, evidence)\n\ntests/test_30_touch_ux.py:36: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nphone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d37b05050>\n\n    def _calculate(phone, evidence):\n        shot = evidence.shot_path(\"calculator\")\n        k = phone.h / 1440\n        # With the on-screen keyboard up, Calculator moves its keypad above it,\n        # but only after a moment. Wait until the \"mod\" row sits still and the\n        # whole keypad (down to its \"0\" row) is clear of the keyboard.\n        mod, last = None, None\n        for i in range(15):\n            phone.screenshot(shot)\n            pos = phone.find_text(shot, \"mod\", case=True)\n            osk = phone.find_text(shot, \"English|Terminal\", case=True, threshold=190)\n            covered = bool(pos and osk and osk[1] - 330 * k < pos[1] + 390 * k)\n            if pos and not covered and last and abs(pos[1] - last[1]) < 5:\n                mod = pos\n                break\n            if covered and i in (5, 10):\n                # nudge: tapping the entry makes the app re-fit above the keyboard\n                phone.tap(phone.w / 2, pos[1] - 150 * k, hold=0.1)\n            last = pos\n            time.sleep(3)\n        assert mod, f\"calculator keypad not visible (last 'mod' at {last})\"\n        evidence.rec[\"shots\"].append({\"file\": str(shot.relative_to(shot.parent.parent)), \"label\": \"calculator\"})\n        read = []\n        for key in (\"C\", \"7\", \"x\", \"6\", \"=\"):\n            dx, dy = ui.CALC_KEYS[key]\n            x, y = mod[0] + dx * k, mod[1] + dy * k\n            read.append(f\"{key}->{phone.read_char(shot, x, y)!r}\")\n            phone.tap(x, y, hold=0.12)\n            time.sleep(1.2)\n        evidence.note(\"calculator keys located from the 'mod' button, read back by OCR: \" + \", \".join(read))\n        res = None\n        for attempt in range(3):\n            try:\n                res = ui.wait_for_text(phone, evidence, r\"42\", timeout=30, label=\"result\")\n                break\n            except VMError:\n                # under emulation a tap can be dropped while the app is busy\n                dx, dy = ui.CALC_KEYS[\"=\"]\n                evidence.note(f\"no result yet, tapping '=' again (attempt {attempt + 2})\")\n                phone.tap(mod[0] + dx * k, mod[1] + dy * k, hold=0.12)\n>       assert res, \"calculator never showed 42\"\nE       AssertionError: calculator never showed 42\nE       assert None\n\ntests/test_30_touch_ux.py:83: AssertionError"
+  },
+  "tests/test_30_touch_ux.py::test_on_screen_keyboard_typing": {
+   "shots": [
+    {
+     "file": "screenshots/test_on_screen_keyboard_typing-01-app-grid.png",
+     "label": "app-grid"
+    },
+    {
+     "file": "screenshots/test_on_screen_keyboard_typing-02-typed.png",
+     "label": "typed"
+    }
+   ],
+   "notes": [
+    "on-screen keyboard layout: Terminal",
+    "keys read back by OCR: u->'u', c->'c.', r->'r', o->'_', m->'m'",
+    "terminal text: 16:50 ucrom@ucrom: ~ = q ~ ea) \u2014\u2014 \u2014 to run a command as administrator (use r \"root\"), use \"sudo <command>\". see \"man sudo_root\" for details. ucrom@ucrom: $ ucrom"
+   ],
+   "title": "Type text using only on-screen keyboard taps",
+   "outcome": "passed",
+   "duration": 87.1
+  },
+  "tests/test_30_touch_ux.py::test_quick_settings_swipe": {
+   "shots": [
+    {
+     "file": "screenshots/test_quick_settings_swipe-01-quick-settings.png",
+     "label": "quick-settings"
+    }
+   ],
+   "notes": [
+    "quick settings text: 16:51 a (0) Saturday, September 26 N \u20ac \u2014_\u2014_\u2014_\u2014_\u2014_=@> Nl Cellular Wi-Fi > XX Bluetooth 0% D) Portrait Ga\u00bb a wv No notifications 16:50 (a",
+    "quick-setting tiles seen: ['Wi-Fi', 'Bluetooth', 'Portrait']"
+   ],
+   "title": "Swipe down from the top opens quick settings",
+   "outcome": "passed",
+   "duration": 11.3
+  },
+  "tests/test_30_touch_ux.py::test_power_button_locks": {
+   "shots": [
+    {
+     "file": "screenshots/test_power_button_locks-01-after-power-button.png",
+     "label": "after-power-button"
+    },
+    {
+     "file": "screenshots/test_power_button_locks-02-lockscreen.png",
+     "label": "lockscreen"
+    },
+    {
+     "file": "screenshots/test_power_button_locks-03-pin-pad.png",
+     "label": "pin-pad"
+    },
+    {
+     "file": "screenshots/test_power_button_locks-04-pin-typed.png",
+     "label": "pin-typed"
+    }
+   ],
+   "notes": [
+    "locked; the system kept running (logind ignores the power key)",
+    "PIN pad keys located and read back by OCR: 1->'1', 2->'2', 4->'4', 5->'5', 7->'7', 8->'8'"
+   ],
+   "title": "The phone's power button blanks and locks the screen (never shuts down)",
+   "outcome": "passed",
+   "duration": 58.1
+  },
+  "tests/test_40_apps.py::test_app_hub_opens": {
+   "shots": [],
+   "notes": [],
+   "title": "App Hub opens from the app grid by touch",
+   "outcome": "failed",
+   "duration": 140.8,
+   "error": "phone = <vm.PhoneVM object at 0x7f1d38511c90>\nonline = ['https_proxy=http://10.0.2.2:34047', 'HTTPS_PROXY=http://10.0.2.2:34047', 'http_proxy=http://10.0.2.2:34047', 'npm_config_https_proxy=http://10.0.2.2:34047', 'NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/test-proxy.crt']\nevidence = <conftest.Evidence object at 0x7f1d37b27050>\n\n    def test_app_hub_opens(phone, online, evidence):\n        \"\"\"App Hub opens from the app grid by touch\"\"\"\n        if ui.is_locked(phone):\n            ui.unlock(phone, evidence)\n>       open_hub(phone, evidence)\n\ntests/test_40_apps.py:83: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntests/test_40_apps.py:43: in open_hub\n    ui.open_favorite(phone, evidence, \"io.ucrom.AppHub.desktop\", \"apphub.py\", r\"App Hub|Install|Claude\")\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nphone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d37b27050>\ndesktop_id = 'io.ucrom.AppHub.desktop', process = 'apphub.py'\nready_text = 'App Hub|Install|Claude', timeout = 300\n\n        shot = Path(tempfile.mkdtemp()) / \"overview.png\"\n        for _ in range(tries):\n            phone.swipe(phone.w / 2, phone.h - 3, phone.w / 2, phone.h * 0.55, duration=0.6, steps=15)\n            time.sleep(4)\n            phone.screenshot(shot)\n            # the field's grey placeholder text OCRs with low confidence\n            pos = phone.find_text(shot, r\"Search( apps\\.*)?\", min_conf=15)\n            if pos:\n                return pos\n        return None\n    \n    \n    def _k(phone):\n        return phone.h / 1440\n    \n    \n    def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300):\n        \"\"\"Tap an app in the favourites rows of the app grid. Favourites are a\n        4-column grid right under the \"Search apps\" field; their order is the\n        configured favourites list (read from gsettings, state only).\"\"\"\n>       favs = phone.sh(\"gsettings get sm.puri.phosh favorites\", user=True).out\nE       vm.VMError: app grid not found (search field at None)\n\ntests/ui.py:167: VMError"
+  },
+  "tests/test_40_apps.py::test_ai_agent[Claude Code-claude-code-claude-claude --version]": {
+   "shots": [],
+   "notes": [],
+   "title": "AI coding agent installs from its official source and starts in the touch terminal",
+   "outcome": "failed",
+   "duration": 129.3,
+   "error": "one = <vm.PhoneVM object at 0x7f1d38511c90>\nonline = ['https_proxy=http://10.0.2.2:34047', 'HTTPS_PROXY=http://10.0.2.2:34047', 'http_proxy=http://10.0.2.2:34047', 'npm_config_https_proxy=http://10.0.2.2:34047', 'NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/test-proxy.crt']\nevidence = <conftest.Evidence object at 0x7f1d38448ed0>, label = 'Claude Code'\napp_id = 'claude-code', process = 'claude', version_cmd = 'claude --version'\n\n    @pytest.mark.parametrize(\"label,app_id,process,version_cmd\", [\n        (\"Claude Code\", \"claude-code\", \"claude\", \"claude --version\"),\n        (\"Codex CLI\", \"codex\", \"codex\", \"codex --version\"),\n    ])\n    def test_ai_agent(phone, online, evidence, label, app_id, process, version_cmd):\n        \"\"\"AI coding agent installs from its official source and starts in the touch terminal\"\"\"\n        if not phone.sh(\"pgrep -f '[a]pphub.py' >/dev/null\").ok:\n>           open_hub(phone, evidence)\n\ntests/test_40_apps.py:94: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntests/test_40_apps.py:43: in open_hub\n    ui.open_favorite(phone, evidence, \"io.ucrom.AppHub.desktop\", \"apphub.py\", r\"App Hub|Install|Claude\")\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nphone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d38448ed0>\ndesktop_id = 'io.ucrom.AppHub.desktop', process = 'apphub.py'\nready_text = 'App Hub|Install|Claude', timeout = 300\n\n        shot = Path(tempfile.mkdtemp()) / \"overview.png\"\n        for _ in range(tries):\n            phone.swipe(phone.w / 2, phone.h - 3, phone.w / 2, phone.h * 0.55, duration=0.6, steps=15)\n            time.sleep(4)\n            phone.screenshot(shot)\n            # the field's grey placeholder text OCRs with low confidence\n            pos = phone.find_text(shot, r\"Search( apps\\.*)?\", min_conf=15)\n            if pos:\n                return pos\n        return None\n    \n    \n    def _k(phone):\n        return phone.h / 1440\n    \n    \n    def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300):\n        \"\"\"Tap an app in the favourites rows of the app grid. Favourites are a\n        4-column grid right under the \"Search apps\" field; their order is the\n        configured favourites list (read from gsettings, state only).\"\"\"\n>       favs = phone.sh(\"gsettings get sm.puri.phosh favorites\", user=True).out\nE       vm.VMError: app grid not found (search field at None)\n\ntests/ui.py:167: VMError"
+  },
+  "tests/test_40_apps.py::test_ai_agent[Codex CLI-codex-codex-codex --version]": {
+   "shots": [],
+   "notes": [],
+   "title": "AI coding agent installs from its official source and starts in the touch terminal",
+   "outcome": "failed",
+   "duration": 126.9,
+   "error": "phone = <vm.PhoneVM object at 0x7f1d38511c90>\nonline = ['https_proxy=http://10.0.2.2:34047', 'HTTPS_PROXY=http://10.0.2.2:34047', 'http_proxy=http://10.0.2.2:34047', 'npm_config_https_proxy=http://10.0.2.2:34047', 'NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/test-proxy.crt']\nevidence = <conftest.Evidence object at 0x7f1d37b08550>, label = 'Codex CLI'\napp_id = 'codex', process = 'codex', version_cmd = 'codex --version'\n\n    @pytest.mark.parametrize(\"label,app_id,process,version_cmd\", [\n        (\"Claude Code\", \"claude-code\", \"claude\", \"claude --version\"),\n        (\"Codex CLI\", \"codex\", \"codex\", \"codex --version\"),\n    ])\n    def test_ai_agent(phone, online, evidence, label, app_id, process, version_cmd):\n        \"\"\"AI coding agent installs from its official source and starts in the touch terminal\"\"\"\n        if not phone.sh(\"pgrep -f '[a]pphub.py' >/dev/null\").ok:\n>           open_hub(phone, evidence)\n\ntests/test_40_apps.py:94: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntests/test_40_apps.py:43: in open_hub\n    ui.open_favorite(phone, evidence, \"io.ucrom.AppHub.desktop\", \"apphub.py\", r\"App Hub|Install|Claude\")\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nphone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d37b08550>\ndesktop_id = 'io.ucrom.AppHub.desktop', process = 'apphub.py'\nready_text = 'App Hub|Install|Claude', timeout = 300\n\n        shot = Path(tempfile.mkdtemp()) / \"overview.png\"\n        for _ in range(tries):\n            phone.swipe(phone.w / 2, phone.h - 3, phone.w / 2, phone.h * 0.55, duration=0.6, steps=15)\n            time.sleep(4)\n            phone.screenshot(shot)\n            # the field's grey placeholder text OCRs with low confidence\n            pos = phone.find_text(shot, r\"Search( apps\\.*)?\", min_conf=15)\n            if pos:\n                return pos\n        return None\n    \n    \n    def _k(phone):\n        return phone.h / 1440\n    \n    \n    def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300):\n        \"\"\"Tap an app in the favourites rows of the app grid. Favourites are a\n        4-column grid right under the \"Search apps\" field; their order is the\n        configured favourites list (read from gsettings, state only).\"\"\"\n>       favs = phone.sh(\"gsettings get sm.puri.phosh favorites\", user=True).out\nE       vm.VMError: app grid not found (search field at None)\n\ntests/ui.py:167: VMError"
+  },
+  "tests/test_40_apps.py::test_vscode": {
+   "shots": [],
+   "notes": [],
+   "title": "VS Code (same Electron/VS Code base as Antigravity) installs and runs, scaled to the phone",
+   "outcome": "failed",
+   "duration": 127.8,
+   "error": "phone = <vm.PhoneVM object at 0x7f1d38511c90>\nonline = ['https_proxy=http://10.0.2.2:34047', 'HTTPS_PROXY=http://10.0.2.2:34047', 'http_proxy=http://10.0.2.2:34047', 'npm_config_https_proxy=http://10.0.2.2:34047', 'NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/test-proxy.crt']\nevidence = <conftest.Evidence object at 0x7f1d37b02890>\n\n    def test_vscode(phone, online, evidence):\n        \"\"\"VS Code (same Electron/VS Code base as Antigravity) installs and runs, scaled to the phone\"\"\"\n        if not phone.sh(\"pgrep -f '[a]pphub.py' >/dev/null\").ok:\n>           open_hub(phone, evidence)\n\ntests/test_40_apps.py:108: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntests/test_40_apps.py:43: in open_hub\n    ui.open_favorite(phone, evidence, \"io.ucrom.AppHub.desktop\", \"apphub.py\", r\"App Hub|Install|Claude\")\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nphone = <vm.PhoneVM object at 0x7f1d38511c90>\nevidence = <conftest.Evidence object at 0x7f1d37b02890>\ndesktop_id = 'io.ucrom.AppHub.desktop', process = 'apphub.py'\nready_text = 'App Hub|Install|Claude', timeout = 300\n\n        shot = Path(tempfile.mkdtemp()) / \"overview.png\"\n        for _ in range(tries):\n            phone.swipe(phone.w / 2, phone.h - 3, phone.w / 2, phone.h * 0.55, duration=0.6, steps=15)\n            time.sleep(4)\n            phone.screenshot(shot)\n            # the field's grey placeholder text OCRs with low confidence\n            pos = phone.find_text(shot, r\"Search( apps\\.*)?\", min_conf=15)\n            if pos:\n                return pos\n        return None\n    \n    \n    def _k(phone):\n        return phone.h / 1440\n    \n    \n    def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300):\n        \"\"\"Tap an app in the favourites rows of the app grid. Favourites are a\n        4-column grid right under the \"Search apps\" field; their order is the\n        configured favourites list (read from gsettings, state only).\"\"\"\n>       favs = phone.sh(\"gsettings get sm.puri.phosh favorites\", user=True).out\nE       vm.VMError: app grid not found (search field at None)\n\ntests/ui.py:167: VMError"
+  },
+  "tests/test_40_apps.py::test_python_ai_tool_via_pipx": {
+   "shots": [],
+   "notes": [
+    "- llm\nllm, version 0.36\n==> launcher added: LLM"
+   ],
+   "title": "A Python AI tool (llm) installs with pipx",
+   "outcome": "passed",
+   "duration": 659.5
+  },
+  "tests/test_50_daemons.py::test_alert_slider": {
+   "shots": [],
+   "notes": [
+    "virtual slider is ID_INPUT_KEY=1, not a keyboard, not blocked: True",
+    "slider position 1 -> 'up silent', feedbackd profile 'silent'",
+    "slider position 2 -> 'middle quiet', feedbackd profile 'quiet'",
+    "slider position 3 -> 'down full', feedbackd profile 'full'"
+   ],
+   "title": "Alert slider: up/middle/down switch silent / vibrate / ring",
+   "outcome": "passed",
+   "duration": 46.5
+  },
+  "tests/test_50_daemons.py::test_popup_camera": {
+   "shots": [],
+   "notes": [
+    "front camera opened -> motor up",
+    "front camera closed -> motor down",
+    "free fall at 1790442869.239485088; helper log:\nucrom-popup-camera: camera up (front camera opened)\nucrom-popup-camera: camera down (front camera closed)\nucrom-popup-camera: camera up (front camera opened)\nucrom-popup-camera: camera down (free fall)\nucrom-popup-camera: camera down (free fall)\nucrom-popup-camera: camera down (free fall)\nucrom-popup-camera: camera down (free fall)\nucrom-popup-camera: camera down (free fall)\nucrom-popup-camera: camera down (free fall)\n1790442867.859815168 dir=1\n1790442871.001776976 dir=0\n1790442871.720539824 dir=0"
+   ],
+   "title": "Pop-up camera rises with the front camera and drops on a fall",
+   "outcome": "passed",
+   "duration": 17.6
+  },
+  "tests/test_50_daemons.py::test_dumpsys_parser": {
+   "shots": [],
+   "notes": [],
+   "title": "Front-camera detection from Android's camera service output",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_50_daemons.py::test_fingerprint_unlock_and_sensor_light": {
+   "shots": [
+    {
+     "file": "screenshots/test_fingerprint_unlock_and_sensor_light-01-locked-scanning.png",
+     "label": "locked-scanning"
+    },
+    {
+     "file": "screenshots/test_fingerprint_unlock_and_sensor_light-02-unlocked-by-fingerprint.png",
+     "label": "unlocked-by-fingerprint"
+    }
+   ],
+   "notes": [
+    "while scanning: dimlayer_bl_en/light = 1on ",
+    "ucrom-fod: this device has no in-display fingerprint sensor\nucrom-fod: identify requested (reply 0)\nucrom-fod: sensor light on\nucrom-fod: finger right-thumb identified; unlocking\nucrom-fod: sensor light off\nright-thumb\n0"
+   ],
+   "title": "In-display fingerprint: locking starts a scan, the sensor lights up, a match unlocks",
+   "outcome": "passed",
+   "duration": 25.1
+  },
+  "tests/test_50_daemons.py::test_refresh_rate_helper": {
+   "shots": [],
+   "notes": [
+    "ucrom-refresh-rate: Virtual-1 -> 720x1440@59.876Hz | current mode before ['720x1440 px'], after ['720x1440 px']"
+   ],
+   "title": "Refresh-rate helper finds the panel and applies a mode",
+   "outcome": "passed",
+   "duration": 5.8
+  },
+  "tests/test_50_daemons.py::test_hardware_check_in_emulator": {
+   "shots": [],
+   "notes": [
+    "ucrom system: PASS - ucrom 0.1 | device emulator/generic | flavor mainline | kernel 6.8.0-142-generic",
+    "Touchscreen: PASS - QEMU Virtio MultiTouch",
+    "Keyboard/mouse blocked: PASS - 2 keyboard/mouse device(s) present and inhibited",
+    "Power/volume buttons: PASS - gpio-keys",
+    "Display: PASS - 5120x2160, refresh rates: 50, 60, 75 Hz",
+    "GPU acceleration: ABSENT - render node driver(s): virtio-pci (no hardware 3D)",
+    "Wi-Fi: ABSENT - no Wi-Fi adapter",
+    "Bluetooth: ABSENT - no Bluetooth adapter (BlueZ)",
+    "Mobile network (calls/SMS/data): ABSENT - no modem found",
+    "Speaker and microphone: ASK - 37 output(s)",
+    "Cameras: ABSENT - no camera",
+    "Pop-up camera: ABSENT - no camera motor",
+    "Fingerprint: ABSENT - no fingerprint service/device",
+    "Sensors: ABSENT - no rotation/light/proximity sensors",
+    "Vibration: ABSENT - no vibration motor",
+    "Flashlight: ABSENT - no flash LED",
+    "NFC: ABSENT - no NFC adapter",
+    "GPS: ABSENT - geoclue present, no GNSS source",
+    "Battery and charging: ABSENT - no battery (mains/emulator)",
+    "Alert slider: ABSENT - no alert slider"
+   ],
+   "title": "Hardware Check runs and tells the truth about the emulator",
+   "outcome": "passed",
+   "duration": 30.0
+  },
+  "tests/test_50_daemons.py::test_refresh_rate_keeps_resolution": {
+   "shots": [],
+   "notes": [],
+   "title": "Refresh-rate choice keeps the panel's resolution (7T Pro: 1440x3120 at 60/90 Hz)",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_kernel_is_the_7t_pro_vendor_kernel": {
+   "shots": [],
+   "notes": [
+    "repo: https://github.com/LineageOS/android_kernel_oneplus_sm8150",
+    "ref: lineage-20",
+    "commit: 2947e6b4dc5f778307b138cd382db103419c4bcb",
+    "release: 4.14.180-perf+",
+    "compiler: Ubuntu clang version 18.1.3 (1ubuntu1)",
+    "fragment_mismatches: 0"
+   ],
+   "title": "Kernel: LineageOS 20 kernel for OnePlus sm8150 (7T Pro)",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_TOUCHPANEL_SAMSUNG_S6SY761-touchscreen (Samsung S6SY761)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_TOUCHPANEL_OPLUS-OnePlus touch framework]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_DRM_MSM-display (MSM DRM/SDE)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_QCA_CLD_WLAN-Wi-Fi (qcacld-3.0)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_MSM_BT_POWER-Bluetooth power control]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_BT_HCIVHCI-Bluetooth bridge (bluebinder via VHCI)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_SPECTRA_CAMERA-cameras (Spectra ISP)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_OPLUS_MOTOR-pop-up camera motor]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_OPLUS_TRI_STATE_KEY-alert slider]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_OPLUS_FINGERPRINT_GOODIX-in-display fingerprint (Goodix)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_AW8697_HAPTIC-vibration motor]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_NFC_NQ-NFC]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_OPLUS_SM8150R_CHARGER-battery and fast charging]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_QCOM_KGSL-GPU (Adreno KGSL)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_phone_hardware_drivers_enabled[CONFIG_ANDROID_BINDERFS-binder (Android driver container)]": {
+   "shots": [],
+   "notes": [],
+   "title": "7T Pro hardware drivers are built into the kernel",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_halium_requirements": {
+   "shots": [],
+   "notes": [
+    "37 required options checked, missing: none; must-be-off but on: none"
+   ],
+   "title": "Every option ucrom needs for systemd + Halium is set",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_touch_only_kernel": {
+   "shots": [],
+   "notes": [
+    "checked off: CONFIG_USB_HID, CONFIG_USB_HIDDEV, CONFIG_USB_KBD, CONFIG_USB_MOUSE, CONFIG_BT_HIDP, CONFIG_UHID, CONFIG_USB_CONFIGFS_F_HID, CONFIG_INPUT_MOUSEDEV, CONFIG_INPUT_KEYBOARD_USB, CONFIG_MAGIC_SYSRQ"
+   ],
+   "title": "HID keyboard/mouse drivers, SysRq and VT are compiled out",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_upstream_halium_checker": {
+   "shots": [],
+   "notes": [
+    "Halium checker items not met: 83; deliberate: ['CONFIG_BT_HIDP']; other: ['CONFIG_ANDROID_PARANOID_NETWORK', 'CONFIG_ARM_UNWIND', 'CONFIG_AUDITSYSCALL', 'CONFIG_AUDIT_TREE', 'CONFIG_AUDIT_WATCH', 'CONFIG_BT_BNEP_MC_FILTER', 'CONFIG_BT_BNEP_PROTO_FILTER', 'CONFIG_BT_HCIBPA10X', 'CONFIG_BT_RFCOMM_TTY', 'CONFIG_CGROUP_MEM_RES_CTLR', 'CONFIG_CGROUP_MEM_RES_CTLR_KMEM', 'CONFIG_CGROUP_MEM_RES_CTLR_SWAP', 'CONFIG_CGROUP_PERF', 'CONFIG_CIFS_DFS_UPCALL', 'CONFIG_CIFS_UPCALL', 'CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS', 'CONFIG_DEBUG_RODATA', 'CONFIG_DEFAULT_SECURITY_APPARMOR', 'CONFIG_DEFAULT_SECURITY_TOMOYO', 'CONFIG_DEFAULT_SECURITY_YAMA', 'CONFIG_DEVKMEM', 'CONFIG_DEVPTS_MULTIPLE_INSTANCES', 'CONFIG_DEVTMPFS_MOUNT', 'CONFIG_DNS_RESOLVER', 'CONFIG_ENCRYPTED_KEYS']"
+   ],
+   "title": "Halium's own check-kernel-config: only deliberate differences remain",
+   "outcome": "passed",
+   "duration": 1.8
+  },
+  "tests/test_60_hotdog.py::test_boot_image": {
+   "shots": [],
+   "notes": [
+    "mkbootimg args: --header_version 2 --os_version 13.0.0 --os_patch_level 2023-12 --kernel /tmp/pytest-of-root/pytest-2/test_boot_image0/kernel --ramdisk /tmp/pytest-of-root/pytest-2/test_boot_image0/ramdisk --dtb /tmp/pytest-of-root/pytest-2/test_boot_image0/dtb --pagesize 0x00001000 --base 0x00000000 --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --second_offset 0x00000000 --tags_offset 0x00000100 --dtb_offset 0x0000000001f00000 --board '' --cmdline 'androidboot.hardware=qcom androidboot.memcg=1 androidboot.usbcontroller=a600000.dwc3 androidboot.vbmeta.avb_version=1.0 loop.max_part=7 lpm_levels.sleep_",
+    "DTBs in boot image: 20",
+    "boot.img size 69619712 bytes (partition 100663296)"
+   ],
+   "title": "boot.img: header v2, kernel + ucrom initramfs + sm8150 DTBs + right cmdline",
+   "outcome": "passed",
+   "duration": 1.2
+  },
+  "tests/test_60_hotdog.py::test_initramfs_contents": {
+   "shots": [],
+   "notes": [
+    "initramfs files: 646; halium script + ucrom touch-only rule present"
+   ],
+   "title": "Initramfs: Halium boot logic + ucrom touch-only rules from the first second",
+   "outcome": "passed",
+   "duration": 1.3
+  },
+  "tests/test_60_hotdog.py::test_dtbo_image": {
+   "shots": [],
+   "notes": [
+    "10 overlays, 3216221 bytes, size_ok=True"
+   ],
+   "title": "dtbo.img: valid Android DT table with the 7T Pro (19801) overlays",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_60_hotdog.py::test_mainline_fallback_device_tree": {
+   "shots": [],
+   "notes": [
+    "model OnePlus 7T Pro, touch samsung,s6sy761 @0x48 on i2c17, 1440x3120 framebuffer @0x9c000000"
+   ],
+   "title": "Mainline fallback: ucrom's own 7T Pro device tree compiles and is correct",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_61_device_artifacts.py::test_device_images[d0]": {
+   "shots": [],
+   "notes": [],
+   "title": "Boot image structure, checksums and userdata filesystem",
+   "outcome": "skipped",
+   "duration": 0.0,
+   "error": "Skipped: no device images built"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[libglibutil]": {
+   "shots": [],
+   "notes": [
+    "libglibutil: OK 1.0.55 f04a3b7 "
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[libgbinder]": {
+   "shots": [],
+   "notes": [
+    "libgbinder: OK 1.1.26 b76f9e4 "
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[android-headers-30]": {
+   "shots": [],
+   "notes": [
+    "android-headers-30: OK 1:9.0~1 a72e00c "
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[libhybris]": {
+   "shots": [],
+   "notes": [
+    "libhybris: OK 0.1.0+git20200424-5 fca30e7 - runs Android GPU/HAL libraries under Linux"
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[halium-wrappers]": {
+   "shots": [],
+   "notes": [
+    "halium-wrappers: FAIL 1f43bf2 build: dpkg-buildpackage: error: cannot open file debian/changelog: No such file or directory dpkg-buildpackage: error: cannot open file debian/changelog: No such file or directory  "
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'halium-wrappers'\nevidence = <conftest.Evidence object at 0x7f1d37b3c7d0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n        assert st, f\"{name} was not attempted\"\n        result, version, note = (st + [\"\", \"\", \"\"])[:3]\n        evidence.note(f\"{name}: {result} {version} {note} {('- ' + WHAT[name]) if name in WHAT else ''}\")\n>       assert result == \"OK\", note\nE       AssertionError: build: dpkg-buildpackage: error: cannot open file debian/changelog: No such file or directory dpkg-buildpackage: error: cannot open file debian/changelog: No such file or directory \nE       assert 'FAIL' == 'OK'\nE         - OK\nE         + FAIL\n\ntests/test_62_bridges.py:47: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[parse-android-dynparts]": {
+   "shots": [],
+   "notes": [
+    "parse-android-dynparts: OK 1.0.0+ubports1 7568bbf "
+   ],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "passed",
+   "duration": 0.0
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[initramfs-tools-halium]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'initramfs-tools-halium'\nevidence = <conftest.Evidence object at 0x7f1d3840acd0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: initramfs-tools-halium was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[wlroots]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'wlroots', evidence = <conftest.Evidence object at 0x7f1d3842e110>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: wlroots was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[phoc]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'phoc', evidence = <conftest.Evidence object at 0x7f1d37b058d0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: phoc was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[bluebinder]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'bluebinder', evidence = <conftest.Evidence object at 0x7f1d37b0d090>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: bluebinder was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[ofono]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'ofono', evidence = <conftest.Evidence object at 0x7f1d37b03a50>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: ofono was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[ofono-binder-plugin]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'ofono-binder-plugin'\nevidence = <conftest.Evidence object at 0x7f1d37b06590>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: ofono-binder-plugin was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[ofono2mm]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'ofono2mm', evidence = <conftest.Evidence object at 0x7f1d37b11990>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: ofono2mm was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[pulseaudio]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'pulseaudio', evidence = <conftest.Evidence object at 0x7f1d37b08490>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: pulseaudio was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[pulseaudio-modules-droid]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'pulseaudio-modules-droid'\nevidence = <conftest.Evidence object at 0x7f1d37b02650>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: pulseaudio-modules-droid was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[droidmedia]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'droidmedia', evidence = <conftest.Evidence object at 0x7f1d37b11950>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: droidmedia was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[gst-droid]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'gst-droid', evidence = <conftest.Evidence object at 0x7f1d37b64e50>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: gst-droid was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[droidian-camera]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'droidian-camera'\nevidence = <conftest.Evidence object at 0x7f1d384358d0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: droidian-camera was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[droidian-fpd]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'droidian-fpd', evidence = <conftest.Evidence object at 0x7f1d37bb8c90>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: droidian-fpd was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[feedbackd]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'feedbackd', evidence = <conftest.Evidence object at 0x7f1d38436b10>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: feedbackd was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[flashlightd]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'flashlightd', evidence = <conftest.Evidence object at 0x7f1d37bb8c50>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: flashlightd was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[batman]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'batman', evidence = <conftest.Evidence object at 0x7f1d37b045d0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: batman was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[sensorfw]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'sensorfw', evidence = <conftest.Evidence object at 0x7f1d37b64290>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: sensorfw was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[nfcd]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'nfcd', evidence = <conftest.Evidence object at 0x7f1d37b3efd0>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: nfcd was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[nfcd-binder-plugin]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'nfcd-binder-plugin'\nevidence = <conftest.Evidence object at 0x7f1d384fe310>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: nfcd-binder-plugin was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridge_builds[lxc-android]": {
+   "shots": [],
+   "notes": [],
+   "title": "Bridge package builds for Ubuntu noble arm64",
+   "outcome": "failed",
+   "duration": 0.0,
+   "error": "name = 'lxc-android', evidence = <conftest.Evidence object at 0x7f1d37b0aa10>\n\n    @pytest.mark.skipif(not STATUS.exists(), reason=\"bridges not built (make bridges)\")\n    @pytest.mark.parametrize(\"name\", LIST)\n    def test_bridge_builds(name, evidence):\n        \"\"\"Bridge package builds for Ubuntu noble arm64\"\"\"\n        st = status().get(name)\n>       assert st, f\"{name} was not attempted\"\nE       AssertionError: lxc-android was not attempted\nE       assert None\n\ntests/test_62_bridges.py:44: AssertionError"
+  },
+  "tests/test_62_bridges.py::test_bridges_installed_and_linkable": {
+   "shots": [],
+   "notes": [
+    "linked OK: /usr/bin/phoc"
+   ],
+   "title": "Bridge binaries are installed in the halium image and all their libraries resolve",
+   "outcome": "passed",
+   "duration": 0.4
+  },
+  "tests/test_63_soc_matrix.py::test_all_profiles_resolve": {
+   "shots": [],
+   "notes": [
+    "oneplus-cheeseburger OnePlus 5 Snapdragon 835 mainline config",
+    "oneplus-dumpling OnePlus 5T Snapdragon 835 mainline config",
+    "oneplus-enchilada OnePlus 6 Snapdragon 845 mainline config",
+    "oneplus-fajita OnePlus 6T Snapdragon 845 mainline full",
+    "oneplus-guacamole OnePlus 7 Pro Snapdragon 855/855+ halium config",
+    "oneplus-hotdog OnePlus 7T Pro / 7T Pro McLaren Edition Snapdragon 855/855+ halium primary",
+    "oneplus-hotdogb OnePlus 7T Snapdragon 855/855+ halium config",
+    "oneplus-hotdogg OnePlus 7T Pro 5G McLaren Snapdragon 855/855+ halium config",
+    "oneplus-instantnoodlep OnePlus 8 Pro Snapdragon 865/865+/870 mainline full",
+    "oneplus-kebab OnePlus 8T Snapdragon 865/865+/870 halium config",
+    "oneplus-lemonade OnePlus 9 Snapdragon 888 mainline config",
+    "oneplus-lemonadep OnePlus 9 Pro Snapdragon 888 mainline config",
+    "oneplus-oneplus3 OnePlus 3 / 3T Snapdragon 820/821 mainline config",
+    "oneplus-salami OnePlus 11 Snapdragon 8 Gen 2 halium experimental",
+    "oneplus-waffle OnePlus 12 Snapdragon 8 Gen 3 halium experimental"
+   ],
+   "title": "All phone profiles resolve to a chip profile",
+   "outcome": "passed",
+   "duration": 0.1
+  },
+  "tests/test_63_soc_matrix.py::test_kernel_sources_and_device_trees": {
+   "shots": [],
+   "notes": [
+    "checks: {'OK': 66, 'NONE': 1}"
+   ],
+   "title": "Kernel branches, defconfigs and device trees exist upstream",
+   "outcome": "passed",
+   "duration": 0.0
+  }
+ },
+ "vm": {
+  "serial_log_tail": ""
+ }
+}
