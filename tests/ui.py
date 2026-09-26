@@ -120,34 +120,78 @@ def unlock(phone, evidence, pin=PIN):
     raise VMError("still locked after entering the PIN")
 
 
-def open_overview(phone, evidence=None):
-    """Open the app grid (tap the home bar / swipe up)."""
-    phone.tap(phone.w / 2, phone.h - 12)
-    time.sleep(3)
-
-
-def open_app(phone, evidence, label, process, timeout=240):
-    """Open an app by tapping its icon label in the app grid (search by
-    scrolling the grid with swipes if it is not on the first screen)."""
-    open_overview(phone)
-    for page in range(6):
-        shot = evidence.shot_path(f"grid-{label.split()[0].lower()}-{page}")
-        phone.screenshot(shot)
-        pos = phone.find_text(shot, label)
-        if pos:
-            phone.tap(*pos)
-            phone.wait_until(f"pgrep -f '{process}' >/dev/null", timeout=timeout, interval=3)
-            time.sleep(8)
-            return pos
-        phone.swipe(phone.w / 2, phone.h * 0.75, phone.w / 2, phone.h * 0.35, duration=0.5)
-        time.sleep(2)
-    raise VMError(f"app '{label}' not found in the app grid")
-
-
-def close_app(phone, process):
-    """Close the foreground app from the overview by swiping its card up."""
-    open_overview(phone)
-    time.sleep(2)
-    phone.swipe(phone.w / 2, phone.h * 0.30, phone.w / 2, 10, duration=0.3)
+def open_overview(phone):
+    """Swipe up from the bottom edge: Phosh's overview (running apps + app grid)."""
+    phone.swipe(phone.w / 2, phone.h - 5, phone.w / 2, phone.h * 0.62, duration=0.6, steps=15)
     time.sleep(4)
-    return not phone.sh(f"pgrep -f '{process}' >/dev/null").ok
+
+
+def _k(phone):
+    return phone.h / 1440
+
+
+def open_favorite(phone, evidence, desktop_id, process, ready_text, timeout=300):
+    """Tap an app in the favourites rows of the app grid. Favourites are a
+    4-column grid right under the "Search apps" field; their order is the
+    configured favourites list (read from gsettings, state only)."""
+    favs = phone.sh("gsettings get sm.puri.phosh favorites", user=True).out
+    order = [x.strip(" '[]\n") for x in favs.split(",")]
+    i = order.index(desktop_id)
+    shot = evidence.shot_path("app-grid")
+    search = None
+    for _ in range(3):
+        open_overview(phone)
+        phone.screenshot(shot)
+        search = phone.find_text(shot, "Search apps...|Search apps|Search")
+        if search:
+            break
+    if not search:
+        raise VMError("app grid not found")
+    evidence.rec["shots"].append({"file": str(shot.relative_to(shot.parent.parent)), "label": "app-grid"})
+    x = phone.w * (0.125 + 0.25 * (i % 4))
+    y = search[1] + (131 if i < 4 else 284) * _k(phone)
+    phone.tap(x, y, hold=0.12)
+    phone.wait_until(f"pgrep -f '{process}' >/dev/null", timeout=timeout, interval=3)
+    wait_for_text(phone, evidence, ready_text, timeout=timeout)
+
+
+def wait_for_text(phone, evidence, pattern, timeout=300, label="screen"):
+    """Wait until OCR finds `pattern` on screen (apps render slowly under TCG)."""
+    import re
+    shot = evidence.shot_path(label)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        phone.screenshot(shot)
+        if re.search(pattern, phone.ocr(shot)):
+            return shot
+        time.sleep(5)
+    raise VMError(f"/{pattern}/ not on screen after {timeout}s")
+
+
+def close_app(phone, process, timeout=40):
+    """Open the overview and swipe the app's card up and away."""
+    open_overview(phone)
+    phone.swipe(phone.w / 2, phone.h * 0.26, phone.w / 2, 10, duration=0.4, steps=12)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if not phone.sh(f"pgrep -f '{process}' >/dev/null").ok:
+            return True
+        time.sleep(2)
+    return False
+
+
+# GNOME Calculator (46) basic keypad, anchored on its "mod" button
+CALC_KEYS = {"7": (-411, 89), "8": (-273, 89), "9": (-136, 89), "x": (0, 180),
+             "4": (-411, 180), "5": (-273, 180), "6": (-136, 180), "=": (136, 315),
+             "1": (-411, 270), "2": (-273, 270), "3": (-136, 270), "0": (-411, 360),
+             "+": (0, 360), "-": (0, 270)}
+
+# phosh-osk-stub English (US) letter layer, anchored on the space bar label
+OSK_ROWS = {"qwertyuiop": (-298, 0.05), "asdfghjkl": (-199, 0.10), "zxcvbnm": (-98, 0.20)}
+
+
+def osk_key(phone, space, ch):
+    for row, (dy, x0) in OSK_ROWS.items():
+        if ch in row:
+            return (phone.w * (x0 + 0.10 * row.index(ch)), space[1] + dy * _k(phone))
+    raise KeyError(ch)
