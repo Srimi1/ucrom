@@ -82,9 +82,9 @@ if [ "$FLAVOR" = halium ]; then
     # The Halium hook copies a touchscreen udev rule: ship ucrom's touch-only
     # policy in its place, so keyboards are blocked from the very first second.
     cp "$MERGED/etc/udev/rules.d/90-ucrom-touch-only.rules" "$MERGED/etc/udev/rules.d/90-touchscreen.rules"
-    printf 'BOOT=halium\nMODULES=dep\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
+    printf 'BOOT=halium\nMODULES=list\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
 else
-    printf 'MODULES=dep\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
+    printf 'MODULES=most\nCOMPRESS=gzip\n' > "$MERGED/etc/initramfs-tools/conf.d/ucrom.conf"
 fi
 chroot_run "$MERGED" sh -c "mkinitramfs -o /tmp/ucrom-initrd.img $KREL" > "$STAGE/initramfs.log" 2>&1 ||
     die "initramfs failed: $(tail -5 "$STAGE/initramfs.log")"
